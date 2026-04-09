@@ -1,16 +1,9 @@
 import mongoose, { connect } from "mongoose"
-import dotenv from "dotenv"
-
-dotenv.config()
+import { config } from "./config.js"
 
 export const connectDB = async () => {
-    try {
-        await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/snitch')
-        .then(() => console.log('Connected to MongoDB'))
-
-    } catch (error) {
-        console.error('Error connecting to MongoDB:', error)
-    }
+    await mongoose.connect(config.MONGODB_URI)
+    console.log('Connected to MongoDB');
 }
 
 export default connectDB
