@@ -44,7 +44,8 @@ export const registerController = async (req, res) => {
             email, 
             contact, 
             password, 
-            fullname 
+            fullname,
+            role: isSeller ? 'seller' : 'buyer'
         })
 
         await sendTokenResponse(user, res, 'User registered successfully')
