@@ -1,5 +1,6 @@
 import {Router} from "express"
-import { validateRegisterUser } from "../validators/auth.validator"
+import { validateRegisterUser } from "../validators/auth.validator.js"
+import { registerController } from "../controllers/auth.controller.js"
 
 const authRouter = Router()
 
@@ -9,7 +10,7 @@ const authRouter = Router()
  * @access Public
  */
 
-authRouter.post('login')
+/* authRouter.post('login') */
 
 /**
  * @route POST /auth/register
@@ -17,7 +18,7 @@ authRouter.post('login')
  * @access Public
  */
 
-authRouter.post('register', validateRegisterUser)
+authRouter.post('register', validateRegisterUser, registerController)
 
 /**
  * @route POST /auth/logout
@@ -25,6 +26,6 @@ authRouter.post('register', validateRegisterUser)
  * @access Private
  */
 
-authRouter.post('logout')
+/* authRouter.post('logout') */
 
 export default authRouter
