@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const authApi = axios.create({
-    baseURL: "http://localhost:3000/api/auth",
+    baseURL: "/api/auth",
     withCredentials: true
 })
 
@@ -26,7 +26,7 @@ export async function loginUser({ email, password }) {
     try {
         const response = await authApi.post("/login", { email, password });
         return response.data;
-        
+
     } catch (error) {
         throw error;
     }
