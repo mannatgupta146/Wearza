@@ -98,7 +98,8 @@ export const loginController = async (req, res) => {
 
 export const googleCallbackController = async (req, res) => {
     try {
-        res.redirect('/home')
+        
+        res.redirect('http://localhost:5173/home')
 
     } catch (error) {
         
