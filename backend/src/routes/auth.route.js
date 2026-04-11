@@ -1,6 +1,6 @@
 import {Router} from "express"
-import { validateRegisterUser } from "../validators/auth.validator.js"
-import { registerController } from "../controllers/auth.controller.js"
+import { validateLoginUser, validateRegisterUser } from "../validators/auth.validator.js"
+import { loginController, registerController } from "../controllers/auth.controller.js"
 
 const authRouter = Router()
 
@@ -10,7 +10,7 @@ const authRouter = Router()
  * @access Public
  */
 
-/* authRouter.post('/login') */
+authRouter.post('/login', validateLoginUser, loginController)
 
 /**
  * @route POST /auth/register

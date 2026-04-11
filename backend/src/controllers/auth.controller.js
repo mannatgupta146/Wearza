@@ -12,8 +12,7 @@ async function sendTokenResponse(user, res, message) {
 
     res.status(200).json({
         success: true,
-        message,
-        token,  
+        message, 
         user: {
             id: user._id,
             email: user.email,
@@ -29,6 +28,7 @@ async function sendTokenResponse(user, res, message) {
 export const registerController = async (req, res) => {
     try {
         const { email, contact, password, fullname, isSeller } = req.body
+
         const existingUser = await userModel.findOne({
             $or: [
                 { email },
@@ -37,7 +37,10 @@ export const registerController = async (req, res) => {
         })
 
         if (existingUser) {
-            return res.status(400).json({ message: 'User with this email or contact number already exists' })
+            return res.status(400).json({ 
+                success: false,
+                message: 'User with this email or contact number already exists' 
+            })
         }
 
         const user = await userModel.create({ 
@@ -51,6 +54,44 @@ export const registerController = async (req, res) => {
         await sendTokenResponse(user, res, 'User registered successfully')
 
     } catch (error) {
-        throw new Error('Error registering user')
+        return res.status(500).json({
+            success: false,
+            message: 'Error registering user'
+        })
+    }
+}
+
+export const loginController = async (req, res) => {
+
+    try {
+        const { email, contact, password, fullname, isSeller } = req.body
+
+        const user = await userModel.findOne({
+            $or: [
+                { email },
+                { contact }
+            ]
+        })  
+
+        if (!user) {
+            return res.status(400).json({ 
+                success: false,
+                message: 'Invalid credentials' 
+            })
+        }
+
+        const isMatch = await user.comparePassword(password)
+
+        if (!isMatch) {
+            return res.status(400).json({ 
+                success: false,
+                message: 'Invalid credentials' 
+            })
+        }
+
+        await sendTokenResponse(user, res, 'User logged in successfully')
+
+    } catch (error) {
+        
     }
 }

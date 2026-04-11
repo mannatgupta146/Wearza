@@ -21,3 +21,13 @@ export async function registerUser({ email, contact, password, fullname, isSelle
         throw error;
     }
 }
+
+export async function loginUser({ email, password }) {
+    try {
+        const response = await authApi.post("/login", { email, password });
+        return response.data;
+        
+    } catch (error) {
+        throw error;
+    }
+}
