@@ -1,11 +1,14 @@
 import React, { useState } from "react"
 import { Link } from "react-router-dom"
 import { useAuth } from "../hooks/useAuth.js"
+import { useNavigate } from "react-router-dom"
 
 const Register = () => {
 
-const {handleRegister} = useAuth()
-    
+  const navigate = useNavigate()
+
+  const { handleRegister } = useAuth()
+
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -28,12 +31,13 @@ const {handleRegister} = useAuth()
   const handleSubmit = async (e) => {
     e.preventDefault()
     await handleRegister({
-        fullname: formData.fullName,
-        email: formData.email,
-        contact: formData.contactNumber,
-        password: formData.password,
-        isSeller: formData.isSellerAccount
+      fullname: formData.fullName,
+      email: formData.email,
+      contact: formData.contactNumber,
+      password: formData.password,
+      isSeller: formData.isSellerAccount,
     })
+    navigate("/home")
   }
 
   return (
@@ -60,50 +64,12 @@ const {handleRegister} = useAuth()
         }}
       >
         {/* Logo Section */}
-        <div className="flex justify-center mb-8">
-          <div className="relative w-16 h-16 flex items-center justify-center">
-            {/* Wearza W Logo with gradient */}
-            <svg
-              viewBox="0 0 100 100"
-              className="w-full h-full"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <defs>
-                <linearGradient
-                  id="logoGradient"
-                  x1="0%"
-                  y1="0%"
-                  x2="100%"
-                  y2="100%"
-                >
-                  <stop
-                    offset="0%"
-                    style={{ stopColor: "#FFD54F", stopOpacity: 1 }}
-                  />
-                  <stop
-                    offset="100%"
-                    style={{ stopColor: "#FF8C00", stopOpacity: 1 }}
-                  />
-                </linearGradient>
-                <filter id="glow">
-                  <feGaussianBlur stdDeviation="2" result="coloredBlur" />
-                  <feMerge>
-                    <feMergeNode in="coloredBlur" />
-                    <feMergeNode in="SourceGraphic" />
-                  </feMerge>
-                </filter>
-              </defs>
-              <path
-                d="M 25 35 L 40 65 L 50 50 L 60 75 L 75 35"
-                stroke="url(#logoGradient)"
-                strokeWidth="6"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                filter="url(#glow)"
-              />
-            </svg>
-          </div>
+        <div className="flex justify-center mb-1">
+          <img
+            src="/logo.png"
+            alt="Wearza Logo"
+            className="h-12 w-auto object-contain mb-3"
+          />
         </div>
 
         {/* Heading */}

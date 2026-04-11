@@ -8,7 +8,7 @@ async function sendTokenResponse(user, res, message) {
         config.JWT_SECRET, 
         { expiresIn: '7d' })
 
-    res.cookies('token', token)
+    res.cookie('token', token)
 
     res.status(200).json({
         success: true,
@@ -28,7 +28,7 @@ async function sendTokenResponse(user, res, message) {
 
 export const registerController = async (req, res) => {
     try {
-        const { email, contact, password, fullname } = req.body
+        const { email, contact, password, fullname, isSeller } = req.body
         const existingUser = await userModel.findOne({
             $or: [
                 { email },
@@ -40,7 +40,7 @@ export const registerController = async (req, res) => {
             return res.status(400).json({ message: 'User with this email or contact number already exists' })
         }
 
-        const user = new userModel.create({ 
+        const user = await userModel.create({ 
             email, 
             contact, 
             password, 

@@ -10,7 +10,7 @@ const authRouter = Router()
  * @access Public
  */
 
-/* authRouter.post('login') */
+/* authRouter.post('/login') */
 
 /**
  * @route POST /auth/register
@@ -18,7 +18,7 @@ const authRouter = Router()
  * @access Public
  */
 
-authRouter.post('register', validateRegisterUser, registerController)
+authRouter.post('/register', validateRegisterUser, registerController)
 
 /**
  * @route POST /auth/logout
@@ -26,6 +26,6 @@ authRouter.post('register', validateRegisterUser, registerController)
  * @access Private
  */
 
-/* authRouter.post('logout') */
+/* authRouter.post('/logout') */
 
 export default authRouter
