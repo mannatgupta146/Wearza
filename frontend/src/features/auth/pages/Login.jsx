@@ -180,6 +180,10 @@ const Login = () => {
               </label>
             </div>
 
+            <a href="/api/auth/google" className="text-yellow-400 hover:text-yellow-300 transition-colors duration-200">
+              Continue with Google
+            </a>
+
             {/* Login Button */}
             <button
               type="submit"
