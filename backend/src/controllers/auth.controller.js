@@ -21,8 +21,6 @@ async function sendTokenResponse(user, res, message) {
             role: user.role
         }
     })
-
-
 }
 
 export const registerController = async (req, res) => {
@@ -98,10 +96,36 @@ export const loginController = async (req, res) => {
 
 export const googleCallbackController = async (req, res) => {
     try {
+
+        const { id, displayName, emails, photos} = req.user
+
+        const email = emails[0].value
+        const profilePic = photos[0].value
+
+        const user = await userModel.findOne({ email })
+
+        if(!user){
+            user = await userModel.create({
+                email,
+                fullname: displayName,
+                googleId: id,
+            })
+        }
+
+        const token = jwt.sign(
+            { id: user._id }, 
+            config.JWT_SECRET, 
+            { expiresIn: '7d' }
+        )
+
+        res.cookie('token', token)
         
         res.redirect('http://localhost:5173/home')
 
     } catch (error) {
-        
+        return res.status(500).json({
+            success: false,
+            message: 'Error during Google authentication'
+        }) 
     }
 }
