@@ -1,12 +1,16 @@
 import React, { useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { toast } from "react-toastify"
 import { useAuth } from "../hooks/useAuth.js"
 import GoogleAuthButton from "../components/GoogleAuthButton"
 
 const autofillStyles = `
-  input:-webkit-autofill {
-    -webkit-box-shadow: 0 0 0 1000px #1a1a1a inset !important;
+  input:-webkit-autofill,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:hover {
+    -webkit-box-shadow: 0 0 0 1000px #121212 inset !important;
     -webkit-text-fill-color: #ffffff !important;
+    transition: background-color 9999s ease-out 0s !important;
   }
 `
 
@@ -32,6 +36,14 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (!formData.email.trim()) {
+      toast.error("Email is required")
+      return
+    }
+    if (!formData.password.trim()) {
+      toast.error("Password is required")
+      return
+    }
     if (isSubmitting) return
 
     try {
@@ -125,8 +137,8 @@ const Login = () => {
             }}
           >
             <img
-              src="https://images.pexels.com/photos/7671166/pexels-photo-7671166.jpeg?auto=compress&cs=tinysrgb&w=1200"
-              alt="Model"
+              src="https://images.pexels.com/photos/3735641/pexels-photo-3735641.jpeg?auto=compress&cs=tinysrgb&w=1200"
+              alt="Model wearing fashionable outfit"
               className="w-full h-full object-cover"
             />
           </div>
@@ -178,7 +190,7 @@ const Login = () => {
                     value={formData.password}
                     onChange={handleChange}
                     placeholder="Password"
-                    className="w-full bg-transparent py-3 text-white outline-none placeholder-gray-500 pr-10"
+                    className="w-full bg-transparent py-3 pr-10 text-white outline-none placeholder-gray-500"
                   />
                 </div>
 
@@ -213,7 +225,7 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-full py-3 mt-4 bg-linear-to-r from-yellow-400 to-orange-500 text-black font-semibold rounded-lg transition-all hover:brightness-110 active:scale-95 ${isSubmitting ? "opacity-70 cursor-not-allowed" : ""}`}
+                className={`w-full py-3 mt-4 bg-linear-to-r from-yellow-400 to-orange-500 text-black font-semibold rounded-lg transition-all hover:brightness-110 active:scale-[0.97] ${isSubmitting ? "opacity-70 cursor-not-allowed" : ""}`}
               >
                 {isSubmitting ? "Logging in..." : "Login"}
               </button>

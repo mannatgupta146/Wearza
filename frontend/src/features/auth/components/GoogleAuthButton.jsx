@@ -2,25 +2,31 @@ import React, { useState } from "react"
 
 const GoogleAuthButton = () => {
   const [isHovering, setIsHovering] = useState(false)
+  const [isActive, setIsActive] = useState(false)
 
   return (
     <a
       href="/api/auth/google"
       onMouseEnter={() => setIsHovering(true)}
-      onMouseLeave={() => setIsHovering(false)}
+      onMouseLeave={() => {
+        setIsHovering(false)
+        setIsActive(false)
+      }}
+      onMouseDown={() => setIsActive(true)}
+      onMouseUp={() => setIsActive(false)}
       className={`
         flex items-center justify-center gap-3 w-full px-6 py-3 rounded-lg
         font-semibold text-base transition-all duration-200
         border border-gray-300 text-gray-800 bg-white
         ${
           isHovering
-            ? "shadow-lg scale-103 bg-gray-50 border-gray-400"
+            ? "shadow-lg bg-gray-50 border-gray-400"
             : "shadow-md hover:shadow-lg"
         }
       `}
       style={{
         textDecoration: "none",
-        transform: isHovering ? "scale(1.02)" : "scale(1)",
+        transform: isActive ? "scale(0.97)" : "scale(1)",
       }}
     >
       {/* Google Logo SVG */}
