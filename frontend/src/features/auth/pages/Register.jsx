@@ -2,6 +2,7 @@ import React, { useState } from "react"
 import { Link } from "react-router-dom"
 import { useAuth } from "../hooks/useAuth.js"
 import { useNavigate } from "react-router-dom"
+import GoogleAuthButton from "../components/GoogleAuthButton"
 
 const autofillStyles = `
   input:-webkit-autofill,
@@ -26,7 +27,6 @@ const Register = () => {
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
-    contactNumber: "",
     password: "",
     isSellerAccount: false,
   })
@@ -47,7 +47,6 @@ const Register = () => {
     await handleRegister({
       fullname: formData.fullName,
       email: formData.email,
-      contact: formData.contactNumber,
       password: formData.password,
       isSeller: formData.isSellerAccount,
     })
@@ -59,7 +58,7 @@ const Register = () => {
       <style>{autofillStyles}</style>
       <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-black">
         {/* Main card container */}
-        <div className="w-full max-w-md mx-4 relative z-10 rounded-2xl p-8 shadow-2xl border border-gray-800 bg-[#121212]">
+        <div className="w-full max-w-md mx-4 relative z-10 rounded-2xl p-7 shadow-2xl border border-gray-800 bg-[#121212]">
           {/* Logo Section */}
           <div className="flex justify-center mb-1">
             <img
@@ -70,15 +69,15 @@ const Register = () => {
           </div>
 
           {/* Heading */}
-          <h1 className="text-center text-3xl font-bold text-white mb-2">
+          <h1 className="text-center text-2xl font-bold text-white mb-1">
             Create Account
           </h1>
-          <p className="text-center text-gray-400 text-sm mb-8">
+          <p className="text-center text-gray-400 text-sm mb-6">
             Join Wearza and discover premium fashion
           </p>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {/* Full Name Input */}
             <div>
               <input
@@ -111,28 +110,6 @@ const Register = () => {
                 onChange={handleChange}
                 onFocus={(e) => {
                   setFocusedField("email")
-                  e.target.style.borderImage =
-                    "linear-gradient(90deg, #FFD54F, #FF8C00) 0 0 1 0"
-                }}
-                onBlur={(e) => {
-                  setFocusedField(null)
-                  e.target.style.borderImage = "none"
-                  e.target.style.borderBottomColor = "#4b5563"
-                }}
-                className="w-full bg-transparent text-white placeholder-gray-600 py-2 px-1 border-b-2 border-gray-700 focus:outline-none transition-all duration-300"
-              />
-            </div>
-
-            {/* Contact Number Input */}
-            <div>
-              <input
-                type="tel"
-                name="contactNumber"
-                placeholder="Contact Number"
-                value={formData.contactNumber}
-                onChange={handleChange}
-                onFocus={(e) => {
-                  setFocusedField("contactNumber")
                   e.target.style.borderImage =
                     "linear-gradient(90deg, #FFD54F, #FF8C00) 0 0 1 0"
                 }}
@@ -212,18 +189,18 @@ const Register = () => {
             </div>
 
             {/* Seller Checkbox */}
-            <div className="flex items-center mt-6">
+            <div className="flex items-center mt-4">
               <input
                 type="checkbox"
                 id="sellerCheckbox"
                 name="isSellerAccount"
                 checked={formData.isSellerAccount}
                 onChange={handleChange}
-                className="w-5 h-5 rounded accent-yellow-400 cursor-pointer"
+                className="w-4 h-4 rounded accent-yellow-400 cursor-pointer"
               />
               <label
                 htmlFor="sellerCheckbox"
-                className="ml-3 text-white cursor-pointer text-sm"
+                className="ml-2 text-white cursor-pointer text-sm"
               >
                 Register as Seller
               </label>
@@ -232,7 +209,7 @@ const Register = () => {
             {/* Register Button */}
             <button
               type="submit"
-              className="w-full mt-8 py-3 px-6 rounded-lg font-semibold text-black text-lg transition-all duration-300 transform hover:scale-105 active:scale-95 cursor-pointer bg-linear-to-br from-yellow-400 to-orange-500 shadow-lg"
+              className="w-full mt-6 py-2.5 px-5 rounded-lg font-semibold text-black text-base transition-all duration-300 transform hover:scale-105 active:scale-95 cursor-pointer bg-linear-to-br from-yellow-400 to-orange-500 shadow-lg"
               onMouseEnter={(e) => {
                 e.target.style.boxShadow = "0 15px 40px rgba(255, 140, 0, 0.5)"
               }}
@@ -242,10 +219,20 @@ const Register = () => {
             >
               Register
             </button>
+
+            {/* Divider */}
+            <div className="flex items-center my-5">
+              <div className="flex-1 border-t border-gray-600"></div>
+              <span className="px-3 text-gray-400 text-sm">or</span>
+              <div className="flex-1 border-t border-gray-600"></div>
+            </div>
+
+            {/* Google Auth Button */}
+            <GoogleAuthButton />
           </form>
 
           {/* Footer Link */}
-          <div className="text-center mt-6">
+          <div className="text-center mt-4">
             <p className="text-gray-400 text-sm">
               Already have an account?{" "}
               <Link

@@ -2,6 +2,7 @@ import React, { useState } from "react"
 import { Link } from "react-router-dom"
 import { useAuth } from "../hooks/useAuth.js"
 import { useNavigate } from "react-router-dom"
+import GoogleAuthButton from "../components/GoogleAuthButton"
 
 const autofillStyles = `
   input:-webkit-autofill,
@@ -54,7 +55,7 @@ const Login = () => {
       <style>{autofillStyles}</style>
       <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-black">
         {/* Main card container */}
-        <div className="w-full max-w-md mx-4 relative z-10 rounded-2xl p-8 shadow-2xl border border-gray-800 bg-[#121212]">
+        <div className="w-full max-w-md mx-4 relative z-10 rounded-2xl p-7 shadow-2xl border border-gray-800 bg-[#121212]">
           {/* Logo Section */}
           <div className="flex justify-center mb-1">
             <img
@@ -65,15 +66,15 @@ const Login = () => {
           </div>
 
           {/* Heading */}
-          <h1 className="text-center text-3xl font-bold text-white mb-2">
+          <h1 className="text-center text-2xl font-bold text-white mb-1">
             Welcome Back
           </h1>
-          <p className="text-center text-gray-400 text-sm mb-8">
+          <p className="text-center text-gray-400 text-sm mb-6">
             Login to your Wearza account
           </p>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email Input */}
             <div>
               <input
@@ -163,31 +164,27 @@ const Login = () => {
             </div>
 
             {/* Seller Checkbox */}
-            <div className="flex items-center">
+            <div className="flex items-center mt-4">
               <input
                 type="checkbox"
                 id="sellerCheckbox"
                 name="isSeller"
                 checked={formData.isSeller}
                 onChange={handleChange}
-                className="w-5 h-5 rounded accent-yellow-400 cursor-pointer"
+                className="w-4 h-4 rounded accent-yellow-400 cursor-pointer"
               />
               <label
                 htmlFor="sellerCheckbox"
-                className="ml-3 text-white cursor-pointer text-sm"
+                className="ml-2 text-white cursor-pointer text-sm"
               >
                 Login as Seller
               </label>
             </div>
 
-            <a href="/api/auth/google" className="text-yellow-400 hover:text-yellow-300 transition-colors duration-200">
-              Continue with Google
-            </a>
-
             {/* Login Button */}
             <button
               type="submit"
-              className="w-full mt-8 py-3 px-6 rounded-lg font-semibold text-black text-lg transition-all duration-300 transform hover:scale-105 active:scale-95 cursor-pointer bg-linear-to-br from-yellow-400 to-orange-500 shadow-lg"
+              className="w-full mt-6 py-2.5 px-5 rounded-lg font-semibold text-black text-base transition-all duration-300 transform hover:scale-105 active:scale-95 cursor-pointer bg-linear-to-br from-yellow-400 to-orange-500 shadow-lg"
               onMouseEnter={(e) => {
                 e.target.style.boxShadow = "0 15px 40px rgba(255, 140, 0, 0.5)"
               }}
@@ -197,10 +194,20 @@ const Login = () => {
             >
               Login
             </button>
+
+            {/* Divider */}
+            <div className="flex items-center my-5">
+              <div className="flex-1 border-t border-gray-600"></div>
+              <span className="px-3 text-gray-400 text-sm">or</span>
+              <div className="flex-1 border-t border-gray-600"></div>
+            </div>
+
+            {/* Google Auth Button */}
+            <GoogleAuthButton />
           </form>
 
           {/* Footer Link */}
-          <div className="text-center mt-6">
+          <div className="text-center mt-4">
             <p className="text-gray-400 text-sm">
               Don't have an account?{" "}
               <Link
