@@ -2,6 +2,7 @@ import React, { useState } from "react"
 import { Link } from "react-router-dom"
 import { useAuth } from "../hooks/useAuth.js"
 import { useNavigate } from "react-router-dom"
+import GoogleAuthButton from "../components/GoogleAuthButton.jsx"
 
 const autofillStyles = `
   input:-webkit-autofill,
@@ -180,9 +181,15 @@ const Login = () => {
               </label>
             </div>
 
-            <a href="/api/auth/google" className="text-yellow-400 hover:text-yellow-300 transition-colors duration-200">
-              Continue with Google
-            </a>
+            {/* Divider */}
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-px bg-gray-700" />
+              <span className="text-gray-500 text-xs">or</span>
+              <div className="flex-1 h-px bg-gray-700" />
+            </div>
+
+            {/* Google Auth Button */}
+            <GoogleAuthButton />
 
             {/* Login Button */}
             <button
