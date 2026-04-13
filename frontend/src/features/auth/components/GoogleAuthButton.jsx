@@ -14,7 +14,7 @@ const GoogleAuthButton = () => {
         border border-gray-300 text-gray-800 bg-white
         ${
           isHovering
-            ? "shadow-lg scale-105 bg-gray-50 border-gray-400"
+            ? "shadow-lg scale-103 bg-gray-50 border-gray-400"
             : "shadow-md hover:shadow-lg"
         }
       `}

@@ -1,21 +1,12 @@
 import React, { useState } from "react"
-import { Link } from "react-router-dom"
-import { useAuth } from "../hooks/useAuth.js"
 import { useNavigate } from "react-router-dom"
+import { useAuth } from "../hooks/useAuth.js"
 import GoogleAuthButton from "../components/GoogleAuthButton"
 
 const autofillStyles = `
-  input:-webkit-autofill,
-  input:-webkit-autofill:hover,
-  input:-webkit-autofill:focus,
-  input:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 1000px #121212 inset !important;
-    -webkit-text-fill-color: white !important;
-    background-color: transparent !important;
-    background-image: none !important;
-  }
-  input::placeholder {
-    color: rgb(107, 114, 128) !important;
+  input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px #1a1a1a inset !important;
+    -webkit-text-fill-color: #ffffff !important;
   }
 `
 
@@ -28,8 +19,7 @@ const Login = () => {
     password: "",
     isSeller: false,
   })
-
-  const [focusedField, setFocusedField] = useState(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
 
   const handleChange = (e) => {
@@ -42,181 +32,215 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    await handleLogin({
-      email: formData.email,
-      password: formData.password,
-      isSeller: formData.isSeller,
-    })
-    navigate("/home")
+    if (isSubmitting) return
+
+    try {
+      setIsSubmitting(true)
+      await handleLogin({
+        email: formData.email,
+        password: formData.password,
+        isSeller: formData.isSeller,
+      })
+      navigate("/home")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
     <>
       <style>{autofillStyles}</style>
-      <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-black">
-        {/* Main card container */}
-        <div className="w-full max-w-md mx-4 relative z-10 rounded-2xl p-7 shadow-2xl border border-gray-800 bg-[#121212]">
-          {/* Logo Section */}
-          <div className="flex justify-center mb-1">
-            <img
-              src="/logo.png"
-              alt="Wearza Logo"
-              className="h-12 w-auto object-contain mb-3"
-            />
+
+      <div className="h-screen w-full bg-[#121212] flex overflow-hidden">
+        {/* LEFT SECTION */}
+        <div className="relative hidden md:flex w-[50%] h-full items-center justify-start">
+          {/* 🔥 VERTICAL LOG IN TEXT */}
+          <div className="absolute left-[30%] top-1/2 -translate-y-1/2 z-20">
+            <svg width="500" height="900" viewBox="0 0 500 900">
+              <defs>
+                <linearGradient
+                  id="wearzaStrokeGradient"
+                  x1="0%"
+                  y1="0%"
+                  x2="100%"
+                  y2="100%"
+                >
+                  <stop offset="0%" stopColor="#facc15" />
+                  <stop offset="100%" stopColor="#f97316" />
+                </linearGradient>
+
+                <path
+                  id="wearzaCurve"
+                  d="M 80 0 A 320 450 0 0 1 80 900"
+                  fill="transparent"
+                />
+              </defs>
+
+              <text
+                fill="transparent"
+                stroke="rgba(255,255,255,0.2)"
+                strokeWidth="1.5"
+                fontSize="130"
+                letterSpacing="10"
+                style={{ textTransform: "uppercase" }}
+              >
+                <textPath
+                  href="#wearzaCurve"
+                  startOffset="50%"
+                  textAnchor="middle"
+                >
+                  {"WEARZA".split("").map((char, i) => (
+                    <tspan
+                      key={i}
+                      className="transition-all duration-300 cursor-default"
+                      onMouseEnter={(e) => {
+                        e.target.setAttribute(
+                          "stroke",
+                          "url(#wearzaStrokeGradient)",
+                        )
+                        e.target.style.filter =
+                          "drop-shadow(0 0 15px rgba(255,200,0,0.9))"
+                        e.target.style.transform = "scale(1.1)"
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.setAttribute("stroke", "rgba(255,255,255,0.2)")
+                        e.target.style.filter = "none"
+                        e.target.style.transform = "scale(1)"
+                      }}
+                    >
+                      {char}
+                    </tspan>
+                  ))}
+                </textPath>
+              </text>
+            </svg>
           </div>
 
-          {/* Heading */}
-          <h1 className="text-center text-2xl font-bold text-white mb-1">
-            Welcome Back
-          </h1>
-          <p className="text-center text-gray-400 text-sm mb-6">
-            Login to your Wearza account
-          </p>
+          {/* CURVED IMAGE */}
+          <div
+            className="relative z-10 h-full w-[70%] overflow-hidden shadow-2xl"
+            style={{
+              borderTopRightRadius: "300px",
+              borderBottomRightRadius: "300px",
+            }}
+          >
+            <img
+              src="https://images.pexels.com/photos/7671166/pexels-photo-7671166.jpeg?auto=compress&cs=tinysrgb&w=1200"
+              alt="Model"
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Email Input */}
-            <div>
-              <input
-                type="email"
-                name="email"
-                placeholder="Email Address"
-                value={formData.email}
-                onChange={handleChange}
-                onFocus={(e) => {
-                  setFocusedField("email")
-                  e.target.style.borderImage =
-                    "linear-gradient(90deg, #FFD54F, #FF8C00) 0 0 1 0"
-                }}
-                onBlur={(e) => {
-                  setFocusedField(null)
-                  e.target.style.borderImage = "none"
-                  e.target.style.borderBottomColor = "#4b5563"
-                }}
-                className="w-full bg-transparent text-white placeholder-gray-600 py-2 px-1 border-b-2 border-gray-700 focus:outline-none transition-all duration-300"
+        {/* RIGHT SECTION */}
+        <div className="w-full md:w-[55%] flex items-center justify-center px-8 bg-[#121212] z-30">
+          <div className="w-full max-w-md flex flex-col items-center">
+            {/* LOGO */}
+            <div className="mb-6">
+              <img
+                src="/logo.png"
+                alt="Wearza Logo"
+                className="h-10 w-auto object-contain"
               />
             </div>
 
-            {/* Password Input */}
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
-                onFocus={(e) => {
-                  setFocusedField("password")
-                  e.target.style.borderImage =
-                    "linear-gradient(90deg, #FFD54F, #FF8C00) 0 0 1 0"
-                }}
-                onBlur={(e) => {
-                  setFocusedField(null)
-                  e.target.style.borderImage = "none"
-                  e.target.style.borderBottomColor = "#4b5563"
-                }}
-                className="w-full bg-transparent text-white placeholder-gray-600 py-2 px-1 border-b-2 border-gray-700 focus:outline-none transition-all duration-300 pr-10"
-              />
-              {/* Eye Icon Button */}
+            {/* HEADING */}
+            <div className="text-center mb-10">
+              <h1 className="text-3xl text-white font-semibold mb-2">
+                Welcome Back
+              </h1>
+              <p className="text-gray-400 text-sm">
+                Login to continue your fashion journey
+              </p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="w-full space-y-8">
+              {/* EMAIL */}
+              <div className="group">
+                <div className="border-b border-gray-700 group-hover:border-yellow-400 transition-all">
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="Email Address"
+                    className="w-full bg-transparent py-3 text-white outline-none placeholder-gray-500"
+                  />
+                </div>
+              </div>
+
+              {/* PASSWORD */}
+              <div className="group relative">
+                <div className="border-b border-gray-700 group-hover:border-yellow-400 transition-all">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="Password"
+                    className="w-full bg-transparent py-3 text-white outline-none placeholder-gray-500 pr-10"
+                  />
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-0 bottom-3 text-xs text-gray-400 hover:text-yellow-400"
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
+
+              {/* ✅ LOGIN AS SELLER */}
+              <div className="flex items-center gap-2 mt-2">
+                <input
+                  type="checkbox"
+                  id="seller"
+                  name="isSeller"
+                  checked={formData.isSeller}
+                  onChange={handleChange}
+                  className="accent-yellow-400 w-4 h-4 cursor-pointer"
+                />
+                <label
+                  htmlFor="seller"
+                  className="text-sm text-gray-300 cursor-pointer"
+                >
+                  Login as a Seller
+                </label>
+              </div>
+
+              {/* LOGIN BUTTON */}
               <button
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-0 bottom-3 text-gray-400 hover:text-yellow-400 transition-colors duration-200 focus:outline-none"
-                aria-label="Toggle password visibility"
+                type="submit"
+                disabled={isSubmitting}
+                className={`w-full py-3 mt-4 bg-linear-to-r from-yellow-400 to-orange-500 text-black font-semibold rounded-lg transition-all hover:brightness-110 active:scale-95 ${isSubmitting ? "opacity-70 cursor-not-allowed" : ""}`}
               >
-                {showPassword ? (
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-4.803m5.596-3.856a3.375 3.375 0 11-4.753-4.753m7.538 12.758a4.5 4.5 0 01-7.588-4.003M9.75 9.75l4.5 4.5M9.75 15.75l5.25-5.25"
-                    />
-                  </svg>
-                )}
+                {isSubmitting ? "Logging in..." : "Login"}
               </button>
-            </div>
 
-            {/* Seller Checkbox */}
-            <div className="flex items-center mt-4">
-              <input
-                type="checkbox"
-                id="sellerCheckbox"
-                name="isSeller"
-                checked={formData.isSeller}
-                onChange={handleChange}
-                className="w-4 h-4 rounded accent-yellow-400 cursor-pointer"
-              />
-              <label
-                htmlFor="sellerCheckbox"
-                className="ml-2 text-white cursor-pointer text-sm"
-              >
-                Login as Seller
-              </label>
-            </div>
+              {/* DIVIDER */}
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-px bg-gray-700" />
+                <span className="text-gray-500 text-sm">or</span>
+                <div className="flex-1 h-px bg-gray-700" />
+              </div>
 
-            {/* Login Button */}
-            <button
-              type="submit"
-              className="w-full mt-6 py-2.5 px-5 rounded-lg font-semibold text-black text-base transition-all duration-300 transform hover:scale-105 active:scale-95 cursor-pointer bg-linear-to-br from-yellow-400 to-orange-500 shadow-lg"
-              onMouseEnter={(e) => {
-                e.target.style.boxShadow = "0 15px 40px rgba(255, 140, 0, 0.5)"
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.boxShadow = "0 10px 25px rgba(255, 140, 0, 0.4)"
-              }}
-            >
-              Login
-            </button>
+              {/* GOOGLE */}
+              <div className="w-full">
+                <GoogleAuthButton />
+              </div>
 
-            {/* Divider */}
-            <div className="flex items-center my-5">
-              <div className="flex-1 border-t border-gray-600"></div>
-              <span className="px-3 text-gray-400 text-sm">or</span>
-              <div className="flex-1 border-t border-gray-600"></div>
-            </div>
-
-            {/* Google Auth Button */}
-            <GoogleAuthButton />
-          </form>
-
-          {/* Footer Link */}
-          <div className="text-center mt-4">
-            <p className="text-gray-400 text-sm">
-              Don't have an account?{" "}
-              <Link
-                to="/register"
-                className="font-semibold transition-all duration-300 hover:opacity-80 bg-linear-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent"
-              >
-                Register
-              </Link>
-            </p>
+              {/* FOOTER */}
+              <p className="text-center text-gray-400 text-sm mt-4">
+                Don’t have an account?{" "}
+                <span
+                  onClick={() => navigate("/register")}
+                  className="text-yellow-400 cursor-pointer hover:underline"
+                >
+                  Register
+                </span>
+              </p>
+            </form>
           </div>
         </div>
       </div>
