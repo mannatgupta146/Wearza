@@ -93,9 +93,11 @@ export const googleCallbackController = async (req, res) => {
       })
     }
 
-    const token = jwt.sign({ id: user._id }, config.JWT_SECRET, {
-      expiresIn: "7d",
-    })
+    const token = jwt.sign(
+      { id: user._id }, 
+      config.JWT_SECRET, 
+      {expiresIn: "7d",}
+    )
 
     res.cookie("token", token)
 
