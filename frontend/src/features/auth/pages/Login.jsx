@@ -247,7 +247,7 @@ const Login = () => {
                 Don’t have an account?{" "}
                 <span
                   onClick={() => navigate("/register")}
-                  className="text-yellow-400 cursor-pointer hover:underline"
+                  className="cursor-pointer hover:underline bg-linear-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent"
                 >
                   Register
                 </span>

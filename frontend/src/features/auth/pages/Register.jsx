@@ -241,7 +241,7 @@ const Register = () => {
               {/* REGISTER BUTTON */}
               <button
                 type="submit"
-                className="w-full py-3 mt-3 bg-linear-to-r from-yellow-400 to-orange-500 
+                className="w-full py-3 mt-3 bg-linear-to-r from-yellow-400 to-orange-400 
                 text-black font-semibold rounded-lg transition-all 
                 hover:brightness-110 active:scale-[0.97]"
               >
@@ -265,7 +265,7 @@ const Register = () => {
                 Already have an account?{" "}
                 <Link
                   to="/login"
-                  className="text-yellow-400 cursor-pointer hover:underline"
+                  className="cursor-pointer hover:underline bg-linear-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent"
                 >
                   Login
                 </Link>
