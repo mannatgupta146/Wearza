@@ -31,18 +31,15 @@ const productSchema = new mongoose.Schema({
         required: true,
     },
 
-    images: {
-        url: {
-            type: String,
-            required: true,
+    images: [
+        {
+            url: {
+                type: String,
+                required: true,
+            },
         },
-
-        alt: {
-            type: String,
-            required: true,
-        }
-    }
-}, {timestamps: true,})
+    ],
+}, { timestamps: true })
 
 const productModel = mongoose.model("products", productSchema)
 

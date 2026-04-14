@@ -22,10 +22,16 @@ if(!process.env.GOOGLE_CLIENT_SECRET) {
     process.exit(1);
 }   
 
+if(!process.env.IMAGEKIT_PRIVATE_KEY) {
+    console.error('Error: IMAGEKIT_PRIVATE_KEY is not defined in the environment variables.');
+    process.exit(1);
+}
+
 export const config = {
     MONGODB_URI: process.env.MONGODB_URI || 'mongodb://localhost:27017/snitch',
     JWT_SECRET: process.env.JWT_SECRET,
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET, 
-    NODE_ENV: process.env.NODE_ENV || 'development'
+    NODE_ENV: process.env.NODE_ENV || 'development',
+    IMAGEKIT_PRIVATE_KEY: process.env.IMAGEKIT_PRIVATE_KEY,
 }
