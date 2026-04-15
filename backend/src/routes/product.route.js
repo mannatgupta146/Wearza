@@ -10,6 +10,6 @@ const upload = multer({
 
 const productRouter = Router()
 
-productRouter.post('', authenticateSeller, upload.array('images', 7), createProduct)
+productRouter.post('/create', authenticateSeller, upload.array('images', 7), createProduct)
 
 export default productRouter
