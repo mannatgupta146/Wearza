@@ -12,12 +12,12 @@ const upload = multer({
 const productRouter = Router()
 
 /**
- * @route POST /api/products/create
+ * @route POST /api/products/
  * @desc Create a new product
  * @access Private (Seller only)
  */
 
-productRouter.post('/create', authenticateSeller, validateCreateProduct, upload.array('images', 7), createProduct)
+productRouter.post('/', authenticateSeller, validateCreateProduct, upload.array('images', 7), createProduct)
 
 /**
  * @route GET /api/products/seller
