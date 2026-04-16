@@ -1,5 +1,5 @@
 import { setError, setLoading, setUser } from "../state/auth.slice"
-import { loginUser, registerUser } from "../services/auth.api"
+import { loginUser, registerUser } from "../services/auth.api.js"
 import { useDispatch } from "react-redux"
 import { toast } from "react-toastify"
 
@@ -20,6 +20,7 @@ export const useAuth = () => {
       dispatch(setUser(data.user))
 
       return { success: true, user: data.user }
+      
     } catch (error) {
       const message =
         error?.response?.data?.message ||
