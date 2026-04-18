@@ -7,7 +7,6 @@ import Dashboard from "../features/products/pages/Dashboard"
 import Protected from "../features/auth/components/Protected"
 import PublicOnly from "../features/auth/components/PublicOnly"
 import SellerLayout from "../features/seller/components/SellerLayout"
-import SellerHome from "../features/seller/pages/SellerHome"
 import SellerProfile from "../features/seller/pages/SellerProfile"
 
 export const routes = createBrowserRouter([
@@ -29,15 +28,11 @@ export const routes = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Navigate to="/seller/home" replace />,
+        element: <Navigate to="/seller/dashboard" replace />,
       },
       {
         path: "create-product",
         element: <CreateProduct />,
-      },
-      {
-        path: "home",
-        element: <SellerHome />,
       },
       {
         path: "dashboard",
