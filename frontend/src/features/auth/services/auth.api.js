@@ -41,3 +41,12 @@ export async function getMe() {
     throw error
   }
 }
+
+export async function logoutUser() {
+  try {
+    const response = await authApi.post("/logout")
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}

@@ -1,6 +1,15 @@
-import {Router} from "express"
-import { validateLoginUser, validateRegisterUser } from "../validators/auth.validator.js"
-import { getMeController, googleCallbackController, loginController, registerController } from "../controllers/auth.controller.js"
+import { Router } from "express"
+import {
+  validateLoginUser,
+  validateRegisterUser,
+} from "../validators/auth.validator.js"
+import {
+  getMeController,
+  googleCallbackController,
+  loginController,
+  logoutController,
+  registerController,
+} from "../controllers/auth.controller.js"
 import passport from "passport"
 import { authenticateUser } from "../middleware/auth.middleware.js"
 
@@ -12,7 +21,7 @@ const authRouter = Router()
  * @access Private
  */
 
-authRouter.get('/me', authenticateUser, getMeController)
+authRouter.get("/me", authenticateUser, getMeController)
 
 /**
  * @route POST /auth/login
@@ -20,7 +29,7 @@ authRouter.get('/me', authenticateUser, getMeController)
  * @access Public
  */
 
-authRouter.post('/login', validateLoginUser, loginController)
+authRouter.post("/login", validateLoginUser, loginController)
 
 /**
  * @route POST /auth/register
@@ -28,7 +37,7 @@ authRouter.post('/login', validateLoginUser, loginController)
  * @access Public
  */
 
-authRouter.post('/register', validateRegisterUser, registerController)
+authRouter.post("/register", validateRegisterUser, registerController)
 
 /**
  * @route POST /auth/logout
@@ -36,7 +45,7 @@ authRouter.post('/register', validateRegisterUser, registerController)
  * @access Private
  */
 
-/* authRouter.post('/logout') */
+authRouter.post("/logout", logoutController)
 
 /**
  * @route GET /auth/google
@@ -44,8 +53,10 @@ authRouter.post('/register', validateRegisterUser, registerController)
  * @access Public
  */
 
-authRouter.get('/google', 
-    passport.authenticate('google', { scope: ['profile', 'email'] }));
+authRouter.get(
+  "/google",
+  passport.authenticate("google", { scope: ["profile", "email"] }),
+)
 
 /**
  * @route GET /auth/google/callback
@@ -53,7 +64,13 @@ authRouter.get('/google',
  * @access Public
  */
 
-authRouter.get('/google/callback', 
-    passport.authenticate('google', { session: false, failureRedirect: 'http://localhost:5173/login' }), googleCallbackController)
+authRouter.get(
+  "/google/callback",
+  passport.authenticate("google", {
+    session: false,
+    failureRedirect: "http://localhost:5173/login",
+  }),
+  googleCallbackController,
+)
 
 export default authRouter

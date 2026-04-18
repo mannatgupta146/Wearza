@@ -55,7 +55,7 @@ const Login = () => {
       })
 
       if (result?.success) {
-        navigate("/")
+        navigate(result?.user?.role === "seller" ? "/seller/dashboard" : "/")
       }
     } finally {
       setIsSubmitting(false)
