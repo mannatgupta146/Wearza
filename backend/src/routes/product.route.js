@@ -1,12 +1,15 @@
-import {Router} from "express"
+import { Router } from "express"
 import { authenticateSeller } from "../middleware/auth.middleware.js"
 import multer from "multer"
-import { createProduct, getSellerProducts } from "../controllers/product.controller.js"
+import {
+  createProduct,
+  getSellerProducts,
+} from "../controllers/product.controller.js"
 import { validateCreateProduct } from "../validators/product.validator.js"
 
 const upload = multer({
-    storage: multer.memoryStorage(),
-    limits: { fileSize: 15 * 1024 * 1024 }, // 15MB limit
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 15 * 1024 * 1024 }, // 15MB limit
 })
 
 const productRouter = Router()
@@ -17,7 +20,13 @@ const productRouter = Router()
  * @access Private (Seller only)
  */
 
-productRouter.post('/', authenticateSeller, validateCreateProduct, upload.array('images', 7), createProduct)
+productRouter.post(
+  "/",
+  authenticateSeller,
+  upload.array("images", 7),
+  validateCreateProduct,
+  createProduct,
+)
 
 /**
  * @route GET /api/products/seller
@@ -25,6 +34,6 @@ productRouter.post('/', authenticateSeller, validateCreateProduct, upload.array(
  * @access Private (Seller only)
  */
 
-productRouter.get('/seller', authenticateSeller, getSellerProducts)
+productRouter.get("/seller", authenticateSeller, getSellerProducts)
 
 export default productRouter
