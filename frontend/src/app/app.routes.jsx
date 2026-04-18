@@ -20,7 +20,7 @@ const PublicOnlyRoute = ({ children }) => {
   const user = useSelector((state) => state.auth.user)
 
   if (user) {
-    return <Navigate to="/home" replace />
+    return <Navigate to="/" replace />
   }
 
   return children
@@ -28,7 +28,7 @@ const PublicOnlyRoute = ({ children }) => {
 
 export const routes = createBrowserRouter([
   {
-    path: "/home",
+    path: "/",
     element: (
       <ProtectedRoute>
         <h1>Home Page</h1>
@@ -38,24 +38,24 @@ export const routes = createBrowserRouter([
   {
     path: "/seller",
     children: [
-        {
-            path: "/seller/create-product",
-            element: (
-                <ProtectedRoute>
-                    <CreateProduct />
-                </ProtectedRoute>
-            )
-        },
+      {
+        path: "/seller/create-product",
+        element: (
+          <ProtectedRoute>
+            <CreateProduct />
+          </ProtectedRoute>
+        ),
+      },
 
-        {
-            path: "/seller/dashboard",
-            element: (
-                <ProtectedRoute>
-                    <Dashboard />
-                </ProtectedRoute>
-            )
-        }
-    ]
+      {
+        path: "/seller/dashboard",
+        element: (
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        ),
+      },
+    ],
   },
   {
     path: "/login",

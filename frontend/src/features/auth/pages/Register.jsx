@@ -58,7 +58,7 @@ const Register = () => {
     })
 
     if (result?.success) {
-      navigate("/home")
+      navigate("/")
     }
   }
 

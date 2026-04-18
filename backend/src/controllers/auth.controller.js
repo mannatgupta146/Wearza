@@ -83,7 +83,7 @@ export const googleCallbackController = async (req, res) => {
     const email = emails[0].value
     const profilePic = photos[0].value
 
-    const user = await userModel.findOne({ email })
+    let user = await userModel.findOne({ email })
 
     if (!user) {
       user = await userModel.create({
@@ -93,15 +93,13 @@ export const googleCallbackController = async (req, res) => {
       })
     }
 
-    const token = jwt.sign(
-      { id: user._id }, 
-      config.JWT_SECRET, 
-      {expiresIn: "7d",}
-    )
+    const token = jwt.sign({ id: user._id }, config.JWT_SECRET, {
+      expiresIn: "7d",
+    })
 
     res.cookie("token", token)
 
-    res.redirect("http://localhost:5173/home")
+    res.redirect("http://localhost:5173/")
   } catch (error) {
     return res.status(500).json({
       success: false,

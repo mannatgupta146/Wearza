@@ -55,7 +55,7 @@ const Login = () => {
       })
 
       if (result?.success) {
-        navigate("/home")
+        navigate("/")
       }
     } finally {
       setIsSubmitting(false)
