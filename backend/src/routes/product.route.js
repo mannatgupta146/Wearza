@@ -3,6 +3,7 @@ import { authenticateSeller } from "../middleware/auth.middleware.js"
 import multer from "multer"
 import {
   createProduct,
+  getAllProducts,
   getSellerProducts,
 } from "../controllers/product.controller.js"
 import { validateCreateProduct } from "../validators/product.validator.js"
@@ -35,5 +36,13 @@ productRouter.post(
  */
 
 productRouter.get("/seller", authenticateSeller, getSellerProducts)
+
+/**
+ * @route GET /api/products/
+ * @desc Get all products (with optional filters)
+ * @access Public
+ */
+
+productRouter.get('/', getAllProducts)
 
 export default productRouter
