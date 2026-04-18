@@ -2,7 +2,7 @@ import userModel from "../models/user.model.js"
 import jwt from "jsonwebtoken"
 import { config } from "../config/config.js"
 
-async function sendTokenResponse(user, res, message) {
+export const sendTokenResponse = async (user, res, message) => {
   const token = jwt.sign({ id: user._id }, config.JWT_SECRET, {
     expiresIn: "7d",
   })
@@ -19,6 +19,28 @@ async function sendTokenResponse(user, res, message) {
       role: user.role,
     },
   })
+}
+
+export const getMeController = async (req, res) => {
+  try {
+    const user = req.user
+
+    res.status(200).json({
+      success: true,
+      user: {
+        id: user._id,
+        email: user.email,
+        fullname: user.fullname,
+        role: user.role,
+      },
+    })
+  } catch (error) {
+
+    res.status(500).json({
+      success: false,
+      message: "Error fetching user data",
+    })
+  }
 }
 
 export const registerController = async (req, res) => {
@@ -73,7 +95,12 @@ export const loginController = async (req, res) => {
     }
 
     await sendTokenResponse(user, res, "User logged in successfully")
-  } catch (error) {}
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error logging in user",
+    })
+  }
 }
 
 export const googleCallbackController = async (req, res) => {

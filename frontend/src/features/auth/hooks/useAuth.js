@@ -1,5 +1,5 @@
 import { setError, setLoading, setUser } from "../state/auth.slice"
-import { loginUser, registerUser } from "../services/auth.api.js"
+import { getMe, loginUser, registerUser } from "../services/auth.api.js"
 import { useDispatch } from "react-redux"
 import { toast } from "react-toastify"
 
@@ -20,7 +20,6 @@ export const useAuth = () => {
       dispatch(setUser(data.user))
 
       return { success: true, user: data.user }
-      
     } catch (error) {
       const message =
         error?.response?.data?.message ||
@@ -56,5 +55,31 @@ export const useAuth = () => {
     }
   }
 
-  return { handleRegister, handleLogin }
+  async function handleGetMe() {
+    try {
+      dispatch(setLoading(true))
+      dispatch(setError(null))
+
+      const data = await getMe()
+      dispatch(setUser(data.user))
+
+      return { success: true, user: data.user }
+    } catch (error) {
+      const status = error?.response?.status
+      const message =
+        error?.response?.data?.message || "Failed to fetch user data."
+
+      dispatch(setUser(null))
+      dispatch(setError(status === 401 ? null : message))
+
+      if (status !== 401) {
+        toast.error(message)
+      }
+      return { success: false, message }
+    } finally {
+      dispatch(setLoading(false))
+    }
+  }
+
+  return { handleRegister, handleLogin, handleGetMe }
 }

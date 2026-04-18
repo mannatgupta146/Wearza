@@ -1,38 +1,18 @@
 import { createBrowserRouter } from "react-router-dom"
-import { Navigate } from "react-router-dom"
-import { useSelector } from "react-redux"
 import Login from "../features/auth/pages/Login"
 import Register from "../features/auth/pages/Register"
 import CreateProduct from "../features/products/pages/CreateProduct"
 import Dashboard from "../features/products/pages/Dashboard"
-
-const ProtectedRoute = ({ children }) => {
-  const user = useSelector((state) => state.auth.user)
-
-  if (!user) {
-    return <Navigate to="/login" replace />
-  }
-
-  return children
-}
-
-const PublicOnlyRoute = ({ children }) => {
-  const user = useSelector((state) => state.auth.user)
-
-  if (user) {
-    return <Navigate to="/" replace />
-  }
-
-  return children
-}
+import Protected from "../features/auth/components/Protected"
+import PublicOnly from "../features/auth/components/PublicOnly"
 
 export const routes = createBrowserRouter([
   {
     path: "/",
     element: (
-      <ProtectedRoute>
+      <Protected>
         <h1>Home Page</h1>
-      </ProtectedRoute>
+      </Protected>
     ),
   },
   {
@@ -41,18 +21,18 @@ export const routes = createBrowserRouter([
       {
         path: "/seller/create-product",
         element: (
-          <ProtectedRoute>
+          <Protected>
             <CreateProduct />
-          </ProtectedRoute>
+          </Protected>
         ),
       },
 
       {
         path: "/seller/dashboard",
         element: (
-          <ProtectedRoute>
+          <Protected>
             <Dashboard />
-          </ProtectedRoute>
+          </Protected>
         ),
       },
     ],
@@ -60,17 +40,17 @@ export const routes = createBrowserRouter([
   {
     path: "/login",
     element: (
-      <PublicOnlyRoute>
+      <PublicOnly>
         <Login />
-      </PublicOnlyRoute>
+      </PublicOnly>
     ),
   },
   {
     path: "/register",
     element: (
-      <PublicOnlyRoute>
+      <PublicOnly>
         <Register />
-      </PublicOnlyRoute>
+      </PublicOnly>
     ),
   },
 ])
