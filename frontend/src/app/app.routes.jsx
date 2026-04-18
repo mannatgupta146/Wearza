@@ -9,11 +9,16 @@ import SellerProfile from "../features/products/pages/SellerProfile"
 import Protected from "../features/auth/components/Protected"
 import PublicOnly from "../features/auth/components/PublicOnly"
 import Home from "../features/products/pages/Home"
+import ProductDetails from "../features/products/pages/ProductDetails"
 
 export const routes = createBrowserRouter([
   {
     path: "/",
     element: <Home />,
+  },
+  {
+    path: "/product/:productId",
+    element: <ProductDetails />,
   },
   {
     path: "/seller",

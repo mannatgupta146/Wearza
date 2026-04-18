@@ -171,6 +171,7 @@ const Home = () => {
                 return (
                   <article
                     key={product?._id}
+                    onClick={()=> navigate(`/product/${product._id}`)}
                     className="overflow-hidden rounded-2xl bg-[#121214]/95 shadow-[0_0_0_1px_rgba(255,255,255,0.05)]"
                   >
                     {image ? (
