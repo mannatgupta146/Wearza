@@ -48,12 +48,15 @@ const Login = () => {
 
     try {
       setIsSubmitting(true)
-      await handleLogin({
+      const result = await handleLogin({
         email: formData.email,
         password: formData.password,
         isSeller: formData.isSeller,
       })
-      navigate("/home")
+
+      if (result?.success) {
+        navigate("/home")
+      }
     } finally {
       setIsSubmitting(false)
     }
