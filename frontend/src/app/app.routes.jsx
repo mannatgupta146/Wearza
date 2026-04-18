@@ -4,6 +4,7 @@ import { useSelector } from "react-redux"
 import Login from "../features/auth/pages/Login"
 import Register from "../features/auth/pages/Register"
 import CreateProduct from "../features/products/pages/CreateProduct"
+import Dashboard from "../features/products/pages/Dashboard"
 
 const ProtectedRoute = ({ children }) => {
   const user = useSelector((state) => state.auth.user)
@@ -35,12 +36,26 @@ export const routes = createBrowserRouter([
     ),
   },
   {
-    path: "/seller/create-product",
-    element: (
-      <ProtectedRoute>
-        <CreateProduct />
-      </ProtectedRoute>
-    ),
+    path: "/seller",
+    children: [
+        {
+            path: "/seller/create-product",
+            element: (
+                <ProtectedRoute>
+                    <CreateProduct />
+                </ProtectedRoute>
+            )
+        },
+
+        {
+            path: "/seller/dashboard",
+            element: (
+                <ProtectedRoute>
+                    <Dashboard />
+                </ProtectedRoute>
+            )
+        }
+    ]
   },
   {
     path: "/login",
