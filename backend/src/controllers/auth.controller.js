@@ -35,7 +35,6 @@ export const getMeController = async (req, res) => {
       },
     })
   } catch (error) {
-
     res.status(500).json({
       success: false,
       message: "Error fetching user data",
@@ -74,7 +73,7 @@ export const registerController = async (req, res) => {
 
 export const loginController = async (req, res) => {
   try {
-    const { email, password } = req.body
+    const { email, password, isSeller = false } = req.body
 
     const user = await userModel.findOne({ email })
 
@@ -91,6 +90,16 @@ export const loginController = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "Invalid credentials",
+      })
+    }
+
+    const requestedRole = isSeller ? "seller" : "buyer"
+    if (user.role !== requestedRole) {
+      return res.status(403).json({
+        success: false,
+        message: isSeller
+          ? "This account is not registered as a seller"
+          : "This account is a seller account. Please enable seller login.",
       })
     }
 

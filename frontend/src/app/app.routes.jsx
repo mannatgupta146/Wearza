@@ -21,7 +21,7 @@ export const routes = createBrowserRouter([
       {
         path: "/seller/create-product",
         element: (
-          <Protected>
+          <Protected role="seller">
             <CreateProduct />
           </Protected>
         ),
@@ -30,7 +30,7 @@ export const routes = createBrowserRouter([
       {
         path: "/seller/dashboard",
         element: (
-          <Protected>
+          <Protected role="seller">
             <Dashboard />
           </Protected>
         ),
