@@ -1,9 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react"
 import { useSelector } from "react-redux"
 import { useProduct } from "../hooks/useProduct.js"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 
 const Dashboard = () => {
+
+  const navigate = useNavigate()
+
   const { fetchSellerProducts } = useProduct()
   const [activeImageMap, setActiveImageMap] = useState({})
   const { sellerProducts, loading, error } = useSelector(
@@ -197,6 +200,7 @@ const Dashboard = () => {
               return (
                 <article
                   key={product?._id}
+                  onClick={()=> {navigate(`/seller/product/${product._id}`)}}
                   className="overflow-hidden rounded-2xl bg-[#121212]/95 shadow-[0_0_0_1px_rgba(255,255,255,0.05)] transition-all hover:-translate-y-0.5 hover:shadow-[0_0_0_1px_rgba(250,204,21,0.22),0_14px_34px_rgba(0,0,0,0.4)]"
                 >
                   <div className="relative">
