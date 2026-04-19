@@ -2,12 +2,21 @@ import userModel from "../models/user.model.js"
 import jwt from "jsonwebtoken"
 import { config } from "../config/config.js"
 
+const TOKEN_COOKIE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000
+
+const getTokenCookieOptions = () => ({
+  httpOnly: true,
+  sameSite: "lax",
+  secure: config.NODE_ENV === "production",
+  maxAge: TOKEN_COOKIE_MAX_AGE_MS,
+})
+
 export const sendTokenResponse = async (user, res, message) => {
   const token = jwt.sign({ id: user._id }, config.JWT_SECRET, {
     expiresIn: "7d",
   })
 
-  res.cookie("token", token)
+  res.cookie("token", token, getTokenCookieOptions())
 
   res.status(200).json({
     success: true,
@@ -114,7 +123,11 @@ export const loginController = async (req, res) => {
 
 export const logoutController = async (req, res) => {
   try {
-    res.clearCookie("token")
+    res.clearCookie("token", {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: config.NODE_ENV === "production",
+    })
     return res.status(200).json({
       success: true,
       message: "Logged out successfully",
@@ -148,7 +161,7 @@ export const googleCallbackController = async (req, res) => {
       expiresIn: "7d",
     })
 
-    res.cookie("token", token)
+    res.cookie("token", token, getTokenCookieOptions())
 
     res.redirect("http://localhost:5173/")
   } catch (error) {
