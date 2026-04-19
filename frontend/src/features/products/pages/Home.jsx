@@ -47,7 +47,7 @@ const Home = () => {
               className="h-9 w-9 rounded-lg object-contain"
             />
             <div>
-              <p className="text-[11px] uppercase tracking-[0.24em] text-amber-200/80">
+              <p className="text-[11px] uppercase tracking-[0.24em] text-gray-300/80">
                 Marketplace
               </p>
               <h1 className="text-xl font-semibold">Wearza</h1>
@@ -60,7 +60,7 @@ const Home = () => {
               end
               className={({ isActive }) =>
                 `relative text-sm font-medium transition-all ${
-                  isActive ? "text-white" : "text-gray-300 hover:text-white"
+                  isActive ? "text-white" : "text-gray-400 hover:text-white"
                 }`
               }
             >
@@ -78,7 +78,7 @@ const Home = () => {
                 to="/seller/dashboard"
                 className={({ isActive }) =>
                   `relative text-sm font-medium transition-all ${
-                    isActive ? "text-white" : "text-gray-300 hover:text-white"
+                    isActive ? "text-white" : "text-gray-400 hover:text-white"
                   }`
                 }
               >
@@ -108,7 +108,7 @@ const Home = () => {
               <p className="text-sm font-medium text-white">
                 {user?.fullname || "Guest User"}
               </p>
-              <p className="text-xs text-gray-400">{user?.email || "-"}</p>
+              <p className="text-xs text-gray-500">{user?.email || "-"}</p>
             </div>
 
             <button
@@ -128,7 +128,7 @@ const Home = () => {
 
         <div className="relative mx-auto max-w-7xl">
           <div className="mb-8">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.28em] text-amber-200/80">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.28em] text-gray-300/85">
               Discover
             </p>
             <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
@@ -171,7 +171,7 @@ const Home = () => {
                 return (
                   <article
                     key={product?._id}
-                    onClick={()=> navigate(`/product/${product._id}`)}
+                    onClick={() => navigate(`/product/${product._id}`)}
                     className="overflow-hidden rounded-2xl bg-[#121214]/95 shadow-[0_0_0_1px_rgba(255,255,255,0.05)]"
                   >
                     {image ? (
@@ -187,13 +187,13 @@ const Home = () => {
                     )}
 
                     <div className="p-4">
-                      <p className="text-xs uppercase tracking-[0.2em] text-gray-500">
+                      <p className="text-xs uppercase tracking-[0.2em] text-gray-400">
                         By {sellerName}
                       </p>
                       <h3 className="mt-2 text-lg font-semibold text-white">
                         {product?.title || "Untitled Product"}
                       </h3>
-                      <p className="mt-2 line-clamp-2 text-sm text-gray-400">
+                      <p className="mt-2 line-clamp-2 text-sm text-gray-300">
                         {product?.description || "No description provided."}
                       </p>
 
@@ -201,7 +201,7 @@ const Home = () => {
                         <p className="text-xs uppercase tracking-[0.18em] text-gray-500">
                           Price
                         </p>
-                        <p className="text-sm font-semibold text-amber-200">
+                        <p className="bg-linear-to-r from-yellow-300 via-amber-400 to-yellow-500 bg-clip-text text-base font-medium leading-tight text-transparent">
                           {formatCurrency(
                             product?.price?.amount,
                             product?.price?.currency || "INR",
