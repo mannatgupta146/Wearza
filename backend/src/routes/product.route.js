@@ -5,6 +5,7 @@ import {
   createProduct,
   getAllProducts,
   getSellerProducts,
+  getProductDetails
 } from "../controllers/product.controller.js"
 import { validateCreateProduct } from "../validators/product.validator.js"
 
@@ -44,5 +45,13 @@ productRouter.get("/seller", authenticateSeller, getSellerProducts)
  */
 
 productRouter.get('/', getAllProducts)
+
+/**
+ * @route GET /api/products/details/:productId
+ * @desc Get details of a specific product
+ * @access Public
+ */
+
+productRouter.get('/details/:productId', getProductDetails)
 
 export default productRouter

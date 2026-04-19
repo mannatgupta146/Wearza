@@ -37,3 +37,13 @@ export async function getAllProducts() {
     }
 }
 
+export async function getProductDetails(productId) {
+    try {
+        const response = await productApi.get(`/details/${productId}`)
+        return response.data
+        
+    } catch (error) {
+        console.error("Error fetching product details:", error)
+        throw error
+    }
+}

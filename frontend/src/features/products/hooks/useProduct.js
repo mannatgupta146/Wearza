@@ -7,6 +7,7 @@ import {
 import {
   createProduct,
   getAllProducts,
+  getProductDetails,
   getSellerProducts,
 } from "../services/product.api.js"
 import { useDispatch } from "react-redux"
@@ -63,5 +64,24 @@ export const useProduct = () => {
     }
   }
 
-  return { handleCreateProduct, fetchSellerProducts, fetchAllProducts }
+  async function fetchProductDetails(productId) {
+    try {
+      dispatch(setLoading(true))
+      dispatch(setError(null))
+
+      const data = await getProductDetails(productId)
+      return { success: true, product: data.product }
+    }
+      catch (error) {
+        const message =
+          error?.response?.data?.message || "Failed to fetch product details"
+        dispatch(setError(message))
+        return { success: false, message }
+      } 
+      finally {
+        dispatch(setLoading(false))
+      }
+  }
+
+  return { handleCreateProduct, fetchSellerProducts, fetchAllProducts, fetchProductDetails }
 }

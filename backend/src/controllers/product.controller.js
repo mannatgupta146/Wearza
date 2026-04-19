@@ -59,3 +59,21 @@ export async function getAllProducts(req, res) {
   })
 }
 
+export async function getProductDetails(req, res) {
+  const { productId } = req.params
+
+  const product = await productModel.findById(productId).populate("seller", "fullname")
+
+  if (!product) {
+    return res.status(404).json({
+      success: false,
+      message: "Product not found",
+    })
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "Product details retrieved successfully",
+    product,
+  })
+}
