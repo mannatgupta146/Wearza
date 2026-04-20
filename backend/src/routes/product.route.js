@@ -5,9 +5,15 @@ import {
   createProduct,
   getAllProducts,
   getSellerProducts,
-  getProductDetails
+  getProductDetails,
+  createProductVariant,
+  updateVariantStock,
 } from "../controllers/product.controller.js"
-import { validateCreateProduct } from "../validators/product.validator.js"
+import {
+  validateCreateProduct,
+  validateCreateVariant,
+  validateUpdateVariantStock,
+} from "../validators/product.validator.js"
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -44,7 +50,7 @@ productRouter.get("/seller", authenticateSeller, getSellerProducts)
  * @access Public
  */
 
-productRouter.get('/', getAllProducts)
+productRouter.get("/", getAllProducts)
 
 /**
  * @route GET /api/products/details/:productId
@@ -52,6 +58,33 @@ productRouter.get('/', getAllProducts)
  * @access Public
  */
 
-productRouter.get('/details/:productId', getProductDetails)
+productRouter.get("/details/:productId", getProductDetails)
+
+/**
+ * @route POST /api/products/:productId/variants
+ * @desc Create a variant for a seller-owned product
+ * @access Private (Seller only)
+ */
+
+productRouter.post(
+  "/:productId/variants",
+  authenticateSeller,
+  upload.array("images", 7),
+  validateCreateVariant,
+  createProductVariant,
+)
+
+/**
+ * @route PATCH /api/products/:productId/variants/:variantId/stock
+ * @desc Update stock of a specific variant for a seller-owned product
+ * @access Private (Seller only)
+ */
+
+productRouter.patch(
+  "/:productId/variants/:variantId/stock",
+  authenticateSeller,
+  validateUpdateVariantStock,
+  updateVariantStock,
+)
 
 export default productRouter
