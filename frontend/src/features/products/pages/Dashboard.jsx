@@ -195,6 +195,10 @@ const Dashboard = () => {
                 images[activeImageIndex]?.url || images[0]?.url
               const currency = product?.price?.currency || "INR"
               const priceAmount = product?.price?.amount || 0
+              const descriptionText =
+                product?.description || "No description added yet."
+              const shouldShowReadMore =
+                (product?.description || "").trim().length > 90
 
               return (
                 <article
@@ -272,14 +276,39 @@ const Dashboard = () => {
                     </div>
                   )}
 
-                  <div className="p-4">
-                    <div className="mb-3">
-                      <h3 className="text-xl font-semibold text-white sm:text-2xl">
+                  <div className="space-y-4 p-4">
+                    <div className="min-h-12">
+                      <h3 className="line-clamp-2 text-xl font-semibold leading-tight text-white sm:text-2xl">
                         {product?.title || "Untitled Product"}
                       </h3>
                     </div>
 
-                    <div className="mb-3 grid grid-cols-3 gap-2">
+                    <div>
+                      <p
+                        className="min-h-6 text-sm leading-6 text-gray-400"
+                        style={{
+                          display: "-webkit-box",
+                          WebkitLineClamp: 1,
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
+                        }}
+                      >
+                        {descriptionText}
+                      </p>
+                      <div className="mt-1 h-5">
+                        {shouldShowReadMore ? (
+                          <span className="inline-block text-xs font-medium text-yellow-300">
+                            Read more
+                          </span>
+                        ) : (
+                          <span className="invisible inline-block text-xs font-medium">
+                            Read more
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2">
                       <div className="rounded-lg bg-[#171717] px-2.5 py-2">
                         <p className="text-xs uppercase tracking-[0.16em] text-gray-500">
                           Price
@@ -305,18 +334,6 @@ const Dashboard = () => {
                         </p>
                       </div>
                     </div>
-
-                    <p
-                      className="text-sm leading-6 text-gray-400"
-                      style={{
-                        display: "-webkit-box",
-                        WebkitLineClamp: 3,
-                        WebkitBoxOrient: "vertical",
-                        overflow: "hidden",
-                      }}
-                    >
-                      {product?.description || "No description"}
-                    </p>
                   </div>
                 </article>
               )
