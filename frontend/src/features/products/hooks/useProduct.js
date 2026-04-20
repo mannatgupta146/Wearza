@@ -83,5 +83,7 @@ export const useProduct = () => {
       }
   }
 
+  
+
   return { handleCreateProduct, fetchSellerProducts, fetchAllProducts, fetchProductDetails }
 }
