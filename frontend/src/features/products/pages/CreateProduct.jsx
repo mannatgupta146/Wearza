@@ -147,6 +147,10 @@ const CreateProduct = () => {
   const isImageLimitReached = remainingImages === 0
   const featuredPreview =
     imagePreviews[activeImageIndex]?.previewUrl || imagePreviews[0]?.previewUrl
+  const shouldAutoScrollRail = imagePreviews.length > 3
+  const railImages = shouldAutoScrollRail
+    ? [...imagePreviews, ...imagePreviews]
+    : imagePreviews
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#0b0b0b] px-4 py-8 sm:px-6 sm:py-10 lg:px-10">
@@ -424,33 +428,30 @@ const CreateProduct = () => {
                           <div
                             className="flex w-max gap-2 sm:gap-3"
                             style={{
-                              animation:
-                                imagePreviews.length > 1
-                                  ? "preview-rail 16s linear infinite"
-                                  : "none",
+                              animation: shouldAutoScrollRail
+                                ? "preview-rail 16s linear infinite"
+                                : "none",
                             }}
                           >
-                            {[...imagePreviews, ...imagePreviews].map(
-                              (item, index) => (
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    setActiveImageIndex(
-                                      index % imagePreviews.length,
-                                    )
-                                  }
-                                  key={`${item.file.name}-${index}`}
-                                  className={`h-20 w-20 flex-none overflow-hidden rounded-xl bg-black transition-all sm:h-24 sm:w-24 ${activeImageIndex === index % imagePreviews.length ? "ring-2 ring-yellow-400 ring-offset-2 ring-offset-[#0f0f0f]" : "opacity-80 hover:opacity-100"}`}
-                                  aria-label={`Set image ${index + 1} as main preview`}
-                                >
-                                  <img
-                                    src={item.previewUrl}
-                                    alt={`Preview ${index + 1}`}
-                                    className="h-full w-full object-cover"
-                                  />
-                                </button>
-                              ),
-                            )}
+                            {railImages.map((item, index) => (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setActiveImageIndex(
+                                    index % imagePreviews.length,
+                                  )
+                                }
+                                key={`${item.file.name}-${index}`}
+                                className={`h-20 w-20 flex-none overflow-hidden rounded-xl bg-black transition-all sm:h-24 sm:w-24 ${activeImageIndex === index % imagePreviews.length ? "ring-2 ring-yellow-400 ring-offset-2 ring-offset-[#0f0f0f]" : "opacity-80 hover:opacity-100"}`}
+                                aria-label={`Set image ${index + 1} as main preview`}
+                              >
+                                <img
+                                  src={item.previewUrl}
+                                  alt={`Preview ${index + 1}`}
+                                  className="h-full w-full object-cover"
+                                />
+                              </button>
+                            ))}
                           </div>
                         </div>
                       ) : (
