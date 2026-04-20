@@ -204,12 +204,12 @@ const Dashboard = () => {
                   }}
                   className="overflow-hidden rounded-2xl bg-[#121212]/95 shadow-[0_0_0_1px_rgba(255,255,255,0.05)] transition-all hover:-translate-y-0.5 hover:shadow-[0_0_0_1px_rgba(250,204,21,0.22),0_14px_34px_rgba(0,0,0,0.4)]"
                 >
-                  <div className="relative">
+                  <div className="relative bg-[#0d0d0d]">
                     {primaryImage ? (
                       <img
                         src={primaryImage}
                         alt={product?.title || "Product image"}
-                        className="h-64 w-full object-cover sm:h-72"
+                        className="h-64 w-full object-contain object-center sm:h-72"
                       />
                     ) : (
                       <div className="flex h-64 items-center justify-center bg-[#171717] text-sm text-gray-500 sm:h-72">
@@ -307,7 +307,7 @@ const Dashboard = () => {
                     </div>
 
                     <p
-                      className="text-base leading-7 text-gray-300"
+                      className="text-sm leading-6 text-gray-400"
                       style={{
                         display: "-webkit-box",
                         WebkitLineClamp: 3,
