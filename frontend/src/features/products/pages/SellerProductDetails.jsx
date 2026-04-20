@@ -15,12 +15,13 @@ const SellerProductDetails = () => {
     stock: "0",
     priceAmount: "",
     priceCurrency: "INR", // Will be updated when product loads
-    attributesText: "size:M\ncolor:Black",
+    attributesText: "",
   })
   const [stockDraft, setStockDraft] = useState({})
   const [selectedVariantFiles, setSelectedVariantFiles] = useState([])
   const [isDragOver, setIsDragOver] = useState(false)
   const [selectedBaseImageIndex, setSelectedBaseImageIndex] = useState(0)
+  const [attributeDraft, setAttributeDraft] = useState({ key: "", value: "" })
 
   const currencyOptions = ["INR", "USD", "EUR", "GBP", "JPY"]
   const MAX_VARIANT_IMAGES = 7
@@ -79,6 +80,26 @@ const SellerProductDetails = () => {
     setSelectedVariantFiles((prev) =>
       prev.filter((_, index) => index !== indexToRemove),
     )
+  }
+
+  const addAttributeLine = () => {
+    const nextKey = attributeDraft.key.trim()
+    const nextValue = attributeDraft.value.trim()
+
+    if (!nextKey || !nextValue) {
+      setActionMessage("Please enter both attribute key and value.")
+      return
+    }
+
+    const nextLine = `${nextKey}:${nextValue}`
+    setVariantForm((prev) => ({
+      ...prev,
+      attributesText: prev.attributesText.trim()
+        ? `${prev.attributesText.trim()}\n${nextLine}`
+        : nextLine,
+    }))
+    setAttributeDraft({ key: "", value: "" })
+    setActionMessage("")
   }
 
   async function fetchProduct() {
@@ -452,6 +473,40 @@ const SellerProductDetails = () => {
                     <p className="text-xs font-medium uppercase tracking-widest text-gray-400">
                       Attributes (required)
                     </p>
+                    <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-[1fr_1fr_auto]">
+                      <input
+                        type="text"
+                        placeholder="Key (e.g. size)"
+                        value={attributeDraft.key}
+                        onChange={(event) =>
+                          setAttributeDraft((prev) => ({
+                            ...prev,
+                            key: event.target.value,
+                          }))
+                        }
+                        className="rounded-lg border border-white/10 bg-[#0f0f10] px-3 py-2.5 text-sm text-white outline-none focus:border-yellow-400/60"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Value (e.g. M)"
+                        value={attributeDraft.value}
+                        onChange={(event) =>
+                          setAttributeDraft((prev) => ({
+                            ...prev,
+                            value: event.target.value,
+                          }))
+                        }
+                        className="rounded-lg border border-white/10 bg-[#0f0f10] px-3 py-2.5 text-sm text-white outline-none focus:border-yellow-400/60"
+                      />
+                      <button
+                        type="button"
+                        onClick={addAttributeLine}
+                        className="rounded-lg border border-yellow-400/40 bg-yellow-400/10 px-4 py-2.5 text-sm font-semibold text-yellow-300 transition-all hover:bg-yellow-400/20"
+                        title="Add attribute"
+                      >
+                        +
+                      </button>
+                    </div>
                     <textarea
                       rows={3}
                       value={variantForm.attributesText}
@@ -507,24 +562,29 @@ const SellerProductDetails = () => {
                     </label>
 
                     {selectedVariantFiles.length > 0 && (
-                      <div className="mt-3">
-                        <div className="grid grid-cols-4 gap-2">
+                      <div className="mt-4">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                           {selectedVariantPreviews.map((item, index) => (
                             <div
                               key={item.id}
-                              className="rounded overflow-hidden relative group"
+                              className="group relative overflow-hidden rounded-2xl bg-black"
                             >
                               <img
                                 src={item.url}
                                 alt={`img ${index + 1}`}
-                                className="h-32 w-full object-cover"
+                                className="h-44 w-full object-cover transition-transform duration-300 group-hover:scale-105 sm:h-48"
                               />
+                              <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/90 via-black/50 to-transparent p-2">
+                                <p className="truncate text-[11px] text-gray-300">
+                                  {item.name}
+                                </p>
+                              </div>
                               <button
                                 type="button"
                                 onClick={() => removeSelectedFile(index)}
-                                className="absolute top-1 right-1 bg-red-500/90 hover:bg-red-600 text-white text-lg w-6 h-6 flex items-center justify-center rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                                className="absolute right-2 top-2 rounded-full border border-red-400/30 bg-black/80 px-2 py-1 text-[11px] text-red-300 opacity-100 transition-all hover:border-red-300 hover:text-red-200 sm:opacity-0 sm:group-hover:opacity-100"
                               >
-                                ✕
+                                Remove
                               </button>
                             </div>
                           ))}
