@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react"
 import { toast } from "react-toastify"
+import { useNavigate } from "react-router-dom"
 import { useProduct } from "../hooks/useProduct"
 
 const MAX_IMAGES = 7
@@ -13,6 +14,7 @@ const previewRailStyles = `
 
 const CreateProduct = () => {
   const { handleCreateProduct } = useProduct()
+  const navigate = useNavigate()
   const fileInputRef = useRef(null)
 
   const [formData, setFormData] = useState({
@@ -135,6 +137,7 @@ const CreateProduct = () => {
       if (result?.success) {
         toast.success("Product created successfully")
         resetForm()
+        navigate("/seller/dashboard")
       } else {
         toast.error(result?.message || "Product creation failed")
       }
