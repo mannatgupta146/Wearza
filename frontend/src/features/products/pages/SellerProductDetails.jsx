@@ -7,7 +7,7 @@ const SellerProductDetails = () => {
   const { fetchProductDetails } = useProduct()
   const [product, setProduct] = useState(null)
   
-  async function fetchProductDetails() {
+  async function fetchProduct() {
     const result = await fetchProductDetails(productId)
     if (result.success) {
       setProduct(result.product)
@@ -15,7 +15,7 @@ const SellerProductDetails = () => {
   }
 
   useEffect(() => {
-    fetchProductDetails()
+    fetchProduct()
   }, [productId])
 
 
