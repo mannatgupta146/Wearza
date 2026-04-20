@@ -4,7 +4,6 @@ import { useProduct } from "../hooks/useProduct.js"
 import { Link, useNavigate } from "react-router-dom"
 
 const Dashboard = () => {
-
   const navigate = useNavigate()
 
   const { fetchSellerProducts } = useProduct()
@@ -200,7 +199,9 @@ const Dashboard = () => {
               return (
                 <article
                   key={product?._id}
-                  onClick={()=> {navigate(`/seller/product/${product._id}`)}}
+                  onClick={() => {
+                    navigate(`/seller/product/${product._id}`)
+                  }}
                   className="overflow-hidden rounded-2xl bg-[#121212]/95 shadow-[0_0_0_1px_rgba(255,255,255,0.05)] transition-all hover:-translate-y-0.5 hover:shadow-[0_0_0_1px_rgba(250,204,21,0.22),0_14px_34px_rgba(0,0,0,0.4)]"
                 >
                   <div className="relative">
@@ -222,9 +223,10 @@ const Dashboard = () => {
                       <>
                         <button
                           type="button"
-                          onClick={() =>
+                          onClick={(event) => {
+                            event.stopPropagation()
                             shiftActiveImage(product?._id, images.length, -1)
-                          }
+                          }}
                           className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full border border-white/20 bg-black/45 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-xs transition-all hover:border-yellow-300/50 hover:bg-black/70"
                           aria-label="Previous image"
                         >
@@ -232,9 +234,10 @@ const Dashboard = () => {
                         </button>
                         <button
                           type="button"
-                          onClick={() =>
+                          onClick={(event) => {
+                            event.stopPropagation()
                             shiftActiveImage(product?._id, images.length, 1)
-                          }
+                          }}
                           className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full border border-white/20 bg-black/45 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-xs transition-all hover:border-yellow-300/50 hover:bg-black/70"
                           aria-label="Next image"
                         >
@@ -248,16 +251,22 @@ const Dashboard = () => {
                     <div className="border-t border-white/5 bg-[#101010] px-3 py-2">
                       <div className="grid grid-cols-7 gap-2 py-1">
                         {images.map((image, index) => (
-                          <div
+                          <button
+                            type="button"
                             key={`${product?._id}-${index}`}
+                            onClick={(event) => {
+                              event.stopPropagation()
+                              setActiveImage(product?._id, index)
+                            }}
                             className={`aspect-square min-w-0 overflow-hidden rounded-lg transition-all ${activeImageIndex === index ? "ring-2 ring-yellow-400" : "border border-white/10 opacity-80"}`}
+                            aria-label={`Show image ${index + 1}`}
                           >
                             <img
                               src={image?.url}
                               alt={`${product?.title || "Product"} image ${index + 1}`}
                               className="h-full w-full object-cover"
                             />
-                          </div>
+                          </button>
                         ))}
                       </div>
                     </div>
@@ -265,40 +274,40 @@ const Dashboard = () => {
 
                   <div className="p-4">
                     <div className="mb-3">
-                      <h3 className="text-lg font-semibold text-white">
+                      <h3 className="text-xl font-semibold text-white sm:text-2xl">
                         {product?.title || "Untitled Product"}
                       </h3>
                     </div>
 
                     <div className="mb-3 grid grid-cols-3 gap-2">
                       <div className="rounded-lg bg-[#171717] px-2.5 py-2">
-                        <p className="text-[10px] uppercase tracking-[0.16em] text-gray-500">
+                        <p className="text-xs uppercase tracking-[0.16em] text-gray-500">
                           Price
                         </p>
-                        <p className="mt-1 text-[11px] font-semibold text-yellow-300">
+                        <p className="mt-1.5 text-sm font-semibold text-yellow-300 sm:text-base">
                           {formatCurrency(priceAmount, currency)}
                         </p>
                       </div>
                       <div className="rounded-lg bg-[#171717] px-2.5 py-2">
-                        <p className="text-[10px] uppercase tracking-[0.16em] text-gray-500">
+                        <p className="text-xs uppercase tracking-[0.16em] text-gray-500">
                           Images
                         </p>
-                        <p className="mt-1 text-[11px] font-semibold text-white">
+                        <p className="mt-1.5 text-sm font-semibold text-white sm:text-base">
                           {product?.images?.length || 0}
                         </p>
                       </div>
                       <div className="rounded-lg bg-[#171717] px-2.5 py-2">
-                        <p className="text-[10px] uppercase tracking-[0.16em] text-gray-500">
+                        <p className="text-xs uppercase tracking-[0.16em] text-gray-500">
                           Created
                         </p>
-                        <p className="mt-1 text-[11px] font-semibold text-white">
+                        <p className="mt-1.5 text-xs font-semibold text-white sm:text-sm">
                           {formatDate(product?.createdAt)}
                         </p>
                       </div>
                     </div>
 
                     <p
-                      className="text-sm leading-6 text-gray-400"
+                      className="text-base leading-7 text-gray-300"
                       style={{
                         display: "-webkit-box",
                         WebkitLineClamp: 3,
