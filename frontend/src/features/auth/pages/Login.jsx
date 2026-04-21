@@ -1,8 +1,6 @@
 import React, { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { toast } from "react-toastify"
-import { useAuth } from "../hooks/useAuth.js"
-import GoogleAuthButton from "../components/GoogleAuthButton"
+import GoogleAuthButton from "../components/GoogleAuthButton.jsx"
 
 const autofillStyles = `
   input:-webkit-autofill,
@@ -240,22 +238,42 @@ const Login = () => {
                 <div className="flex-1 h-px bg-gray-700" />
               </div>
 
-              {/* GOOGLE */}
-              <div className="w-full">
-                <GoogleAuthButton />
-              </div>
+            {/* Divider */}
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-px bg-gray-700" />
+              <span className="text-gray-500 text-xs">or</span>
+              <div className="flex-1 h-px bg-gray-700" />
+            </div>
 
-              {/* FOOTER */}
-              <p className="text-center text-gray-400 text-sm mt-4">
-                Don’t have an account?{" "}
-                <span
-                  onClick={() => navigate("/register")}
-                  className="cursor-pointer hover:underline bg-linear-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent"
-                >
-                  Register
-                </span>
-              </p>
-            </form>
+            {/* Google Auth Button */}
+            <GoogleAuthButton />
+
+            {/* Login Button */}
+            <button
+              type="submit"
+              className="w-full mt-8 py-3 px-6 rounded-lg font-semibold text-black text-lg transition-all duration-300 transform hover:scale-105 active:scale-95 cursor-pointer bg-linear-to-br from-yellow-400 to-orange-500 shadow-lg"
+              onMouseEnter={(e) => {
+                e.target.style.boxShadow = "0 15px 40px rgba(255, 140, 0, 0.5)"
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.boxShadow = "0 10px 25px rgba(255, 140, 0, 0.4)"
+              }}
+            >
+              Login
+            </button>
+          </form>
+
+          {/* Footer Link */}
+          <div className="text-center mt-6">
+            <p className="text-gray-400 text-sm">
+              Don't have an account?{" "}
+              <Link
+                to="/register"
+                className="font-semibold transition-all duration-300 hover:opacity-80 bg-linear-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent"
+              >
+                Register
+              </Link>
+            </p>
           </div>
         </div>
       </div>
