@@ -3,8 +3,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { useSelector } from "react-redux"
 import { toast } from "react-toastify"
 import { useAuth } from "../hooks/useAuth.js"
-import { useNavigate } from "react-router-dom"
-import GoogleAuthButton from "../components/GoogleAuthButton.jsx"
+import GoogleAuthButton from "../components/GoogleAuthButton"
 
 const autofillStyles = `
   input:-webkit-autofill,
@@ -256,30 +255,10 @@ const Register = () => {
                 <div className="flex-1 h-px bg-gray-700" />
               </div>
 
-            {/* Divider */}
-            <div className="flex items-center gap-3">
-              <div className="flex-1 h-px bg-gray-700" />
-              <span className="text-gray-500 text-xs">or</span>
-              <div className="flex-1 h-px bg-gray-700" />
-            </div>
-
-            {/* Google Auth Button */}
-            <GoogleAuthButton />
-
-            {/* Register Button */}
-            <button
-              type="submit"
-              className="w-full mt-8 py-3 px-6 rounded-lg font-semibold text-black text-lg transition-all duration-300 transform hover:scale-105 active:scale-95 cursor-pointer bg-linear-to-br from-yellow-400 to-orange-500 shadow-lg"
-              onMouseEnter={(e) => {
-                e.target.style.boxShadow = "0 15px 40px rgba(255, 140, 0, 0.5)"
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.boxShadow = "0 10px 25px rgba(255, 140, 0, 0.4)"
-              }}
-            >
-              Register
-            </button>
-          </form>
+              {/* GOOGLE */}
+              <div className="w-full">
+                <GoogleAuthButton />
+              </div>
 
               {/* FOOTER */}
               <p className="text-center text-gray-400 text-sm mt-4">
