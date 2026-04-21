@@ -67,3 +67,27 @@ export async function updateProductVariantStock(productId, variantId, stock) {
     throw error
   }
 }
+
+export async function addProductVariant(productId, newProductVariant) {
+  const formData = new FormData()
+
+  if (newProductVariant.images && newProductVariant.images.length > 0) {
+    newProductVariant.images.forEach((image) => {
+      if (image.file) {
+        formData.append("images", image.file)
+      }
+    })
+  }
+
+  formData.append("stock", newProductVariant.stock)
+  formData.append("priceAmount", newProductVariant.price)
+  formData.append("attributes", JSON.stringify(newProductVariant.attributes))
+
+  const response = await productApi.post(`/${productId}/variants`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  })
+
+  return response.data
+}
