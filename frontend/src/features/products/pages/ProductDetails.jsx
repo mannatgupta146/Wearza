@@ -377,6 +377,39 @@ const ProductDetails = () => {
                   </p>
                 </div>
 
+                {Object.keys(availableAttributes).length > 0 && (
+                  <div className="mt-6">
+                    <h3 className="text-lg font-semibold text-white">
+                      Select Variants
+                    </h3>
+                    <div className="mt-4 space-y-4">
+                      {Object.entries(availableAttributes).map(([key, values]) => (
+                        <div key={key}>
+                          <p className="mb-2 text-sm font-medium text-gray-300">
+                            {key}
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {values.map((val) => (
+                              <button
+                                key={val}
+                                type="button"
+                                onClick={() => handleAttributeSelect(key, val)}
+                                className={`rounded-md border px-3 py-1 text-sm transition-all ${
+                                  selectedAttributes[key] === val
+                                    ? "bg-amber-400 text-black border-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.3)]"
+                                    : "bg-[#1c1c1f] text-gray-300 border-white/10 hover:border-white/30 hover:bg-[#252529]"
+                                }`}
+                              >
+                                {val}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div className="mt-6 flex items-center justify-between rounded-md border border-white/10 bg-[#17181b] px-3 py-2">
                   <p className="text-[11px] uppercase tracking-[0.15em] text-gray-500">
                     Quantity
@@ -433,36 +466,7 @@ const ProductDetails = () => {
                   </p>
                 )}
 
-                <div className="mt-6">
-                  <h3 className="text-lg font-semibold text-white">
-                    Select Variants
-                  </h3>
-                  <div className="mt-4 space-y-4">
-                    {Object.entries(availableAttributes).map(([key, values]) => (
-                      <div key={key}>
-                        <p className="mb-2 text-sm font-medium text-gray-300">
-                          {key}
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                          {values.map((val) => (
-                            <button
-                              key={val}
-                              type="button"
-                              onClick={() => handleAttributeSelect(key, val)}
-                              className={`rounded-md border px-3 py-1 text-sm transition-all ${
-                                selectedAttributes[key] === val
-                                  ? "bg-amber-400 text-black border-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.3)]"
-                                  : "bg-[#1c1c1f] text-gray-300 border-white/10 hover:border-white/30 hover:bg-[#252529]"
-                              }`}
-                            >
-                              {val}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+
               </div>
             </div>
           </section>
