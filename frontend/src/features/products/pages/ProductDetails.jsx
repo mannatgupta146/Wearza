@@ -265,23 +265,27 @@ const ProductDetails = () => {
                       <button
                         type="button"
                         onClick={handlePreviousImage}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full border border-white/20 bg-black/30 backdrop-blur-md p-3 text-white transition-all hover:bg-black/50 hover:border-amber-300/50 opacity-0 group-hover:opacity-100"
+                        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 rounded-full border border-white/20 bg-black/40 backdrop-blur-md p-3 text-white transition-all hover:bg-black/60 hover:border-amber-300/50 opacity-70 group-hover:opacity-100"
                         aria-label="Show previous image"
                       >
-                        <span className="text-xl">←</span>
+                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
+                        </svg>
                       </button>
 
                       <button
                         type="button"
                         onClick={handleNextImage}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full border border-white/20 bg-black/30 backdrop-blur-md p-3 text-white transition-all hover:bg-black/50 hover:border-amber-300/50 opacity-0 group-hover:opacity-100"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 rounded-full border border-white/20 bg-black/40 backdrop-blur-md p-3 text-white transition-all hover:bg-black/60 hover:border-amber-300/50 opacity-70 group-hover:opacity-100"
                         aria-label="Show next image"
                       >
-                        <span className="text-xl">→</span>
+                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
+                        </svg>
                       </button>
 
-                      <div className="absolute bottom-4 right-4 rounded-full border border-white/20 bg-black/40 backdrop-blur-md px-3 py-1 text-[10px] font-medium tracking-wider text-white/90">
-                        {selectedImageIndex + 1} / {productImages.length}
+                      <div className="absolute bottom-5 right-5 z-20 rounded-full border border-white/10 bg-black/50 backdrop-blur-xl px-4 py-2 text-xs font-bold uppercase tracking-widest text-white shadow-2xl">
+                        {selectedImageIndex + 1} <span className="mx-1.5 opacity-30">/</span> {productImages.length}
                       </div>
                     </>
                   )}
@@ -297,17 +301,25 @@ const ProductDetails = () => {
                           type="button"
                           key={`${imageUrl}-${index}`}
                           onClick={() => setImageWithTransition(index)}
-                          className={`relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border-2 transition-all duration-300 ${
+                          className={`relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border-2 transition-all duration-300 bg-[#1a1a1c] ${
                             isActive
-                              ? "border-amber-400 scale-105 shadow-[0_0_15px_rgba(251,191,36,0.3)]"
+                              ? "border-amber-400 scale-105 shadow-[0_0_15px_rgba(251,191,36,0.25)]"
                               : "border-transparent opacity-60 hover:opacity-100 hover:scale-105"
                           }`}
                           aria-label={`View image ${index + 1}`}
                         >
+                          {/* Background blur for thumbnail */}
+                          <img
+                            src={imageUrl}
+                            alt=""
+                            className="absolute inset-0 h-full w-full object-cover blur-lg opacity-40"
+                            aria-hidden="true"
+                          />
+                          {/* Main contained thumbnail */}
                           <img
                             src={imageUrl}
                             alt={`${product?.title || "Product"} thumbnail ${index + 1}`}
-                            className="h-full w-full object-cover"
+                            className="relative z-10 h-full w-full object-contain"
                           />
                         </button>
                       )
@@ -357,7 +369,7 @@ const ProductDetails = () => {
                     </div>
                   </div>
 
-                  <h1 className="bg-gradient-to-br from-white via-white to-gray-500 bg-clip-text text-4xl font-bold tracking-tight text-transparent sm:text-5xl lg:text-6xl">
+                  <h1 className="bg-gradient-to-br from-white via-white to-gray-500 bg-clip-text text-3xl font-bold tracking-tight text-transparent sm:text-4xl lg:text-5xl">
                     {displayedTitle}
                   </h1>
 
@@ -377,8 +389,8 @@ const ProductDetails = () => {
                 <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
                 <div className="space-y-4">
-                  <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500">The Story</h3>
-                  <p className="text-lg leading-relaxed text-gray-300 font-light">
+                  <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-500">The Story</h3>
+                  <p className="text-base leading-relaxed text-gray-400 font-normal">
                     {product?.description || "A masterfully crafted piece designed for those who value both style and substance. Every detail has been considered to ensure ultimate comfort and timeless aesthetic appeal."}
                   </p>
                 </div>
@@ -428,17 +440,17 @@ const ProductDetails = () => {
                     </div>
                   )}
 
-                  <div className="flex items-center justify-between rounded-2xl border border-white/5 bg-white/[0.03] p-4">
-                    <div className="space-y-1">
-                      <p className="text-[10px] uppercase tracking-widest text-gray-500">Quantity</p>
-                      <p className="text-xs text-gray-400 font-medium">Adjust units</p>
+                  <div className="flex items-center justify-between rounded-2xl border border-white/5 bg-white/[0.03] p-5">
+                    <div className="space-y-1.5">
+                      <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Quantity</p>
+                      <p className="text-sm text-gray-500 font-medium tracking-tight">Adjust units</p>
                     </div>
 
                     <div className="flex items-center gap-4 bg-black/40 rounded-xl p-1 border border-white/5">
                       <button
                         type="button"
                         onClick={decrementQuantity}
-                        className="h-9 w-9 rounded-lg bg-white/5 text-sm font-bold text-white transition-all hover:bg-white/10 active:scale-95 disabled:opacity-30"
+                        className="h-9 w-9 rounded-lg bg-white/5 text-sm font-bold text-white transition-all hover:bg-white/10 active:scale-95 disabled:opacity-20"
                         disabled={quantity <= 1}
                         aria-label="Decrease quantity"
                       >
@@ -450,7 +462,7 @@ const ProductDetails = () => {
                       <button
                         type="button"
                         onClick={incrementQuantity}
-                        className="h-9 w-9 rounded-lg bg-white/5 text-sm font-bold text-white transition-all hover:bg-white/10 active:scale-95 disabled:opacity-30"
+                        className="h-9 w-9 rounded-lg bg-white/5 text-sm font-bold text-white transition-all hover:bg-white/10 active:scale-95 disabled:opacity-20"
                         disabled={quantity >= 10}
                         aria-label="Increase quantity"
                       >
