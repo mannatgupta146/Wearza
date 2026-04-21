@@ -292,7 +292,7 @@ const ProductDetails = () => {
                 </div>
 
                 {hasMultipleImages && (
-                  <div className="flex gap-3 overflow-x-auto py-2 scrollbar-hide">
+                  <div className="flex gap-3 overflow-x-auto px-2 py-2 scrollbar-hide">
                     {productImages.map((imageUrl, index) => {
                       const isActive = index === selectedImageIndex
 

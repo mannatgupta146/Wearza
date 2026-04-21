@@ -163,50 +163,80 @@ const Home = () => {
           )}
 
           {!loading && !error && products?.length > 0 && (
-            <section className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+            <section className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {products.map((product) => {
                 const image = product?.images?.[0]?.url
                 const sellerName = product?.seller?.fullname || "Unknown seller"
+                const inStock = product?.countInStock > 0
 
                 return (
                   <article
                     key={product?._id}
                     onClick={() => navigate(`/product/${product._id}`)}
-                    className="overflow-hidden rounded-2xl bg-[#121214]/95 shadow-[0_0_0_1px_rgba(255,255,255,0.05)]"
+                    className="group cursor-pointer flex flex-col overflow-hidden rounded-[2.5rem] border border-white/10 bg-zinc-900/40 backdrop-blur-3xl transition-all duration-700 hover:-translate-y-3 hover:border-amber-400/40 hover:bg-zinc-900/60 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8),0_0_20px_rgba(251,191,36,0.05)]"
                   >
-                    {image ? (
-                      <img
-                        src={image}
-                        alt={product?.title || "Product"}
-                        className="h-80 w-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-80 items-center justify-center bg-[#171719] text-sm text-gray-500">
-                        No image available
+                    {/* Image Container with 1:1 Aspect Ratio (Square) */}
+                    <div className="relative aspect-square w-full shrink-0 overflow-hidden bg-black/40">
+                      {image ? (
+                        <>
+                          {/* Background Blur Layer */}
+                          <img
+                            src={image}
+                            alt=""
+                            className="absolute inset-0 h-full w-full object-cover blur-3xl opacity-20 brightness-50"
+                            aria-hidden="true"
+                          />
+                          {/* Main Image Layer (Fit Inside) */}
+                          <div className="relative flex h-full items-center justify-center p-4 transition-transform duration-1000 group-hover:scale-110">
+                            <img
+                              src={image}
+                              alt={product?.title || "Product"}
+                              className="max-h-full max-w-full rounded-xl object-contain drop-shadow-[0_15px_25px_rgba(0,0,0,0.6)]"
+                            />
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex h-full items-center justify-center bg-zinc-900 text-sm text-gray-500">
+                          <span className="opacity-40 tracking-widest uppercase text-[10px] font-bold">No Visuals</span>
+                        </div>
+                      )}
+                      
+                      {/* Floating Seller Tag */}
+                      <div className="absolute left-4 top-4 z-20 rounded-full border border-white/10 bg-black/40 backdrop-blur-xl px-2.5 py-1 text-[8px] font-black uppercase tracking-[0.2em] text-white/90 shadow-lg transition-all group-hover:border-amber-400/50 group-hover:bg-amber-400 group-hover:text-black">
+                        {sellerName}
                       </div>
-                    )}
 
-                    <div className="p-4">
-                      <p className="text-xs uppercase tracking-[0.2em] text-gray-400">
-                        By {sellerName}
-                      </p>
-                      <h3 className="mt-2 text-lg font-semibold text-white">
-                        {product?.title || "Untitled Product"}
-                      </h3>
-                      <p className="mt-2 line-clamp-2 text-sm text-gray-300">
-                        {product?.description || "No description provided."}
-                      </p>
+                      {/* Stock Status Badge */}
+                      <div className={`absolute right-4 top-4 z-20 flex items-center gap-1.5 rounded-full border border-white/10 bg-black/40 backdrop-blur-xl px-2.5 py-1 shadow-lg`}>
+                        <div className={`h-1.5 w-1.5 rounded-full ${inStock ? "bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.6)]" : "bg-rose-500"}`} />
+                        <span className={`text-[8px] font-black uppercase tracking-widest ${inStock ? "text-emerald-400" : "text-rose-400"}`}>
+                          {inStock ? "In Stock" : "Sold Out"}
+                        </span>
+                      </div>
+                    </div>
 
-                      <div className="mt-4 flex items-center justify-between rounded-xl bg-[#18181a] px-3 py-2">
-                        <p className="text-xs uppercase tracking-[0.18em] text-gray-500">
-                          Price
-                        </p>
-                        <p className="bg-linear-to-r from-yellow-300 via-amber-400 to-yellow-500 bg-clip-text text-base font-medium leading-tight text-transparent">
-                          {formatCurrency(
-                            product?.price?.amount,
-                            product?.price?.currency || "INR",
-                          )}
-                        </p>
+                    <div className="flex flex-1 flex-col p-5 pt-4">
+                      {/* Title Section with fixed height for alignment */}
+                      <div className="flex h-12 flex-col justify-center text-center">
+                        <h3 className="line-clamp-2 text-base font-bold leading-tight tracking-tight text-white transition-colors duration-500 group-hover:text-amber-400">
+                          {product?.title || "Untitled Product"}
+                        </h3>
+                      </div>
+
+                      {/* Footer Section */}
+                      <div className="mt-2 flex flex-col items-center space-y-1">
+                        <div className="h-px w-8 bg-white/10 transition-all duration-500 group-hover:w-16 group-hover:bg-amber-400/40" />
+                        <div className="pt-2 text-center">
+                          <span className="block text-[8px] font-black uppercase tracking-[0.3em] text-gray-500 transition-colors duration-500 group-hover:text-amber-400/60">
+                            Collection Piece
+                          </span>
+                          <span className="mt-0.5 block bg-gradient-to-br from-white via-white to-gray-400 bg-clip-text text-xl font-black tracking-tighter text-transparent">
+                            {formatCurrency(
+                              product?.price?.amount,
+                              product?.price?.currency || "INR",
+                            )}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </article>
