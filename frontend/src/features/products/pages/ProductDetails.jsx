@@ -13,11 +13,13 @@ const ProductDetails = () => {
   const [quantity, setQuantity] = useState(1)
   const [isWishlisted, setIsWishlisted] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [showStockError, setShowStockError] = useState(false)
   const [selectedAttributes, setSelectedAttributes] = useState({})
   const [selectedVariant, setSelectedVariant] = useState(null) // Ensure selectedVariant is initialized to null
 
   const transitionTimerRef = useRef(null)
   const copyTimerRef = useRef(null)
+  const errorTimerRef = useRef(null)
 
   const { fetchProductDetails } = useProduct()
 
@@ -95,6 +97,7 @@ const ProductDetails = () => {
   const displayedPrice =
     selectedVariant?.price?.amount || product?.price?.amount
   const displayedStock = selectedVariant?.stock || product?.stock || 0
+  const isInStock = displayedStock > 0
 
   const setImageWithTransition = (nextIndex) => {
     if (nextIndex === selectedImageIndex) return
@@ -191,10 +194,23 @@ const ProductDetails = () => {
   const hasMultipleImages =
     (selectedVariant?.images?.length || productImages.length) > 1
 
+  const handleActionClick = (actionType) => {
+    if (!isInStock) {
+      if (errorTimerRef.current) clearTimeout(errorTimerRef.current)
+      setShowStockError(true)
+      errorTimerRef.current = setTimeout(() => setShowStockError(false), 500)
+      return
+    }
+    
+    // Placeholder for actual cart/buy logic
+    console.log(`${actionType} clicked for product:`, product._id)
+  }
+
   useEffect(() => {
     return () => {
       if (transitionTimerRef.current) clearTimeout(transitionTimerRef.current)
       if (copyTimerRef.current) clearTimeout(copyTimerRef.current)
+      if (errorTimerRef.current) clearTimeout(errorTimerRef.current)
     }
   }, [])
 
@@ -451,7 +467,7 @@ const ProductDetails = () => {
                         type="button"
                         onClick={decrementQuantity}
                         className="h-9 w-9 rounded-lg bg-white/5 text-sm font-bold text-white transition-all hover:bg-white/10 active:scale-95 disabled:opacity-20"
-                        disabled={quantity <= 1}
+                        disabled={quantity <= 1 || !isInStock}
                         aria-label="Decrease quantity"
                       >
                         −
@@ -463,7 +479,7 @@ const ProductDetails = () => {
                         type="button"
                         onClick={incrementQuantity}
                         className="h-9 w-9 rounded-lg bg-white/5 text-sm font-bold text-white transition-all hover:bg-white/10 active:scale-95 disabled:opacity-20"
-                        disabled={quantity >= 10}
+                        disabled={quantity >= 10 || !isInStock}
                         aria-label="Increase quantity"
                       >
                         +
@@ -472,19 +488,43 @@ const ProductDetails = () => {
                   </div>
                 </div>
 
+                {!isInStock && (
+                  <div className={`animate-in fade-in slide-in-from-top-2 duration-500 rounded-2xl border border-rose-500/20 bg-rose-500/5 p-4 flex items-center gap-4 transition-all ${showStockError ? "animate-shake border-rose-500/40 bg-rose-500/10" : ""}`}>
+                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-all ${showStockError ? "bg-rose-500 text-white scale-110" : "bg-rose-500/20 text-rose-400"}`}>
+                      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className={`text-[10px] font-black uppercase tracking-[0.2em] transition-colors ${showStockError ? "text-rose-400" : "text-rose-500/70"}`}>Inventory Alert</p>
+                      <p className={`text-xs font-medium transition-colors ${showStockError ? "text-white" : "text-rose-300/70"}`}> This item is currently out of stock and cannot be added to your cart.</p>
+                    </div>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-1 gap-4 pt-4 sm:grid-cols-2">
                   <button
                     type="button"
-                    className="w-full rounded-2xl border border-white/10 bg-white/5 py-4 text-xs font-bold uppercase tracking-[0.2em] text-white transition-all duration-300 hover:bg-white/10 hover:border-white/30 active:scale-[0.98]"
+                    onClick={() => handleActionClick("add_to_cart")}
+                    className={`w-full rounded-2xl border py-4 text-xs font-bold uppercase tracking-[0.2em] transition-all duration-300 active:scale-[0.98] ${
+                      isInStock 
+                        ? "border-white/10 bg-white/5 text-white hover:bg-white/10 hover:border-white/30" 
+                        : `border-white/5 bg-white/[0.02] text-white/40 cursor-pointer ${showStockError ? "animate-shake border-rose-500/30 text-rose-400" : ""}`
+                    }`}
                   >
-                    Add to Cart
+                    {isInStock ? "Add to Cart" : "Out of Stock"}
                   </button>
 
                   <button
                     type="button"
-                    className="w-full rounded-2xl bg-gradient-to-r from-amber-400 via-orange-400 to-orange-500 py-4 text-xs font-black uppercase tracking-[0.2em] text-black shadow-[0_10px_30px_rgba(251,191,36,0.25)] transition-all duration-300 hover:brightness-110 hover:-translate-y-1 active:scale-[0.98]"
+                    onClick={() => handleActionClick("buy_now")}
+                    className={`w-full rounded-2xl py-4 text-xs font-black uppercase tracking-[0.2em] transition-all duration-300 active:scale-[0.98] ${
+                      isInStock 
+                        ? "bg-gradient-to-r from-amber-400 via-orange-400 to-orange-500 text-black shadow-[0_10px_30px_rgba(251,191,36,0.25)] hover:brightness-110 hover:-translate-y-1" 
+                        : `bg-white/[0.04] text-white/50 border border-white/5 cursor-pointer ${showStockError ? "animate-shake border-rose-500/30 text-rose-400" : ""}`
+                    }`}
                   >
-                    Buy Now
+                    {isInStock ? "Buy Now" : "Sold Out"}
                   </button>
                 </div>
 
