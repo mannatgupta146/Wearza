@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { useEffect, useMemo, useRef, useState } from "react"
 import { Link, useParams } from "react-router-dom"
 import { useProduct } from "../hooks/useProduct"
 
@@ -13,6 +13,8 @@ const ProductDetails = () => {
   const [quantity, setQuantity] = useState(1)
   const [isWishlisted, setIsWishlisted] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [selectedAttributes, setSelectedAttributes] = useState({})
+  const [selectedVariant, setSelectedVariant] = useState(null) // Ensure selectedVariant is initialized to null
 
   const transitionTimerRef = useRef(null)
   const copyTimerRef = useRef(null)
@@ -29,6 +31,7 @@ const ProductDetails = () => {
       setProduct(data.product)
       setSelectedImageIndex(0)
       setQuantity(1)
+      setSelectedVariant(null)
     } else {
       setError(data.message || "Failed to fetch product details")
     }
@@ -39,6 +42,28 @@ const ProductDetails = () => {
   useEffect(() => {
     fetchDetails()
   }, [productId])
+
+  const availableAttributes = useMemo(() => {
+    if (!product?.variants) return {}
+    const attrs = {}
+    product.variants.forEach((variant) => {
+      Object.entries(variant.attributes || {}).forEach(([key, value]) => {
+        if (!attrs[key]) attrs[key] = new Set()
+        attrs[key].add(value)
+      })
+    })
+    Object.keys(attrs).forEach((key) => {
+      attrs[key] = Array.from(attrs[key])
+    })
+    return attrs
+  }, [product])
+
+  useEffect(() => {
+    if (Object.keys(selectedAttributes).length === 0) {
+      setSelectedVariant(null)
+    }
+  }, [selectedAttributes])
+
 
   const formatCurrency = (amount, currency = "INR") => {
     try {
@@ -52,12 +77,24 @@ const ProductDetails = () => {
     }
   }
 
-  const productImages = (product?.images || [])
+  const productImages = (selectedVariant?.images || product?.images || [])
     .map((image) => (typeof image === "string" ? image : image?.url))
     .filter(Boolean)
 
-  const selectedImage = productImages[selectedImageIndex] || null
-  const hasMultipleImages = productImages.length > 1
+  useEffect(() => {
+    if (selectedImageIndex >= productImages.length && productImages.length > 0) {
+      setSelectedImageIndex(0)
+    }
+  }, [productImages.length, selectedImageIndex])
+
+  const displayedImage = selectedVariant
+    ? selectedVariant?.images?.[selectedImageIndex]?.url
+    : productImages[selectedImageIndex] || null
+
+  const displayedTitle = selectedVariant?.title || product?.title
+  const displayedPrice =
+    selectedVariant?.price?.amount || product?.price?.amount
+  const displayedStock = selectedVariant?.stock || product?.stock || 0
 
   const setImageWithTransition = (nextIndex) => {
     if (nextIndex === selectedImageIndex) return
@@ -124,22 +161,35 @@ const ProductDetails = () => {
     }
   }
 
-  useEffect(() => {
-    if (!hasMultipleImages) return
-
-    const onKeyDown = (event) => {
-      if (event.key === "ArrowLeft") {
-        handlePreviousImage()
+  const handleAttributeSelect = (key, value) => {
+    setSelectedAttributes((prev) => {
+      const newAttrs = { ...prev }
+      if (newAttrs[key] === value) {
+        delete newAttrs[key]
+      } else {
+        newAttrs[key] = value
       }
 
-      if (event.key === "ArrowRight") {
-        handleNextImage()
-      }
-    }
+      const matchingVariant = product.variants.find((variant) => {
+        return Object.entries(newAttrs).every(
+          ([attrKey, attrValue]) => variant.attributes[attrKey] === attrValue,
+        )
+      })
 
-    window.addEventListener("keydown", onKeyDown)
-    return () => window.removeEventListener("keydown", onKeyDown)
-  }, [hasMultipleImages, selectedImageIndex, productImages.length])
+      if (Object.keys(newAttrs).length > 0 && matchingVariant) {
+        setSelectedVariant(matchingVariant)
+        setSelectedImageIndex(0)
+      } else {
+        setSelectedVariant(null)
+        setSelectedImageIndex(0)
+      }
+
+      return newAttrs
+    })
+  }
+
+  const hasMultipleImages =
+    (selectedVariant?.images?.length || productImages.length) > 1
 
   useEffect(() => {
     return () => {
@@ -184,10 +234,10 @@ const ProductDetails = () => {
             <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[1.15fr_0.85fr]">
               <div>
                 <div className="relative overflow-hidden rounded-md border border-white/10 bg-[#141416]">
-                  {selectedImage ? (
+                  {displayedImage ? (
                     <img
-                      src={selectedImage}
-                      alt={product?.title || "Product image"}
+                      src={displayedImage}
+                      alt={displayedTitle || "Product image"}
                       className={`h-128 w-full object-cover transition-all duration-300 sm:h-144 ${
                         isImageTransitioning
                           ? "scale-[1.02] opacity-80"
@@ -286,19 +336,24 @@ const ProductDetails = () => {
                 </div>
 
                 <h1 className="mt-2 bg-linear-to-r from-yellow-300 via-amber-300 to-orange-400 bg-clip-text text-3xl font-medium leading-tight text-transparent sm:text-4xl">
-                  {product?.title || "Untitled Product"}
+                  {displayedTitle}
                 </h1>
 
                 <p className="mt-3 text-xs uppercase tracking-[0.12em] text-gray-500">
                   In {product?.price?.currency || "INR"}
                 </p>
 
-                <p className="mt-1 bg-linear-to-r from-yellow-300 via-amber-300 to-orange-400 bg-clip-text text-2xl font-semibold text-transparent sm:text-3xl">
-                  {formatCurrency(
-                    product?.price?.amount,
-                    product?.price?.currency || "INR",
-                  )}
-                </p>
+                <div className="mt-4">
+                  <h1 className="text-2xl font-bold text-white">
+                    {displayedTitle}
+                  </h1>
+                  <p className="mt-2 text-lg font-semibold text-amber-400">
+                    {formatCurrency(displayedPrice)}
+                  </p>
+                  <p className="mt-1 text-sm text-gray-400">
+                    Stock: {displayedStock}
+                  </p>
+                </div>
 
                 <div className="mt-5 h-px bg-white/10" />
 
@@ -377,6 +432,37 @@ const ProductDetails = () => {
                     Tip: use keyboard arrows to browse product images.
                   </p>
                 )}
+
+                <div className="mt-6">
+                  <h3 className="text-lg font-semibold text-white">
+                    Select Variants
+                  </h3>
+                  <div className="mt-4 space-y-4">
+                    {Object.entries(availableAttributes).map(([key, values]) => (
+                      <div key={key}>
+                        <p className="mb-2 text-sm font-medium text-gray-300">
+                          {key}
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {values.map((val) => (
+                            <button
+                              key={val}
+                              type="button"
+                              onClick={() => handleAttributeSelect(key, val)}
+                              className={`rounded-md border px-3 py-1 text-sm transition-all ${
+                                selectedAttributes[key] === val
+                                  ? "bg-amber-400 text-black border-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.3)]"
+                                  : "bg-[#1c1c1f] text-gray-300 border-white/10 hover:border-white/30 hover:bg-[#252529]"
+                              }`}
+                            >
+                              {val}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           </section>
