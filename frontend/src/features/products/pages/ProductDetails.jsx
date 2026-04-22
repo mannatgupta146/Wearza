@@ -217,7 +217,7 @@ const ProductDetails = () => {
   }, [])
 
   return (
-    <div className="min-h-screen bg-[#09090a] px-4 py-8 text-white sm:px-6 lg:px-10">
+    <div className="min-h-screen bg-[#09090a] px-4 pt-32 pb-20 text-white sm:px-6 lg:px-10">
       <div className="mx-auto max-w-6xl">
         <div className="mb-6 flex items-center justify-between gap-3">
           <Link

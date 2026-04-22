@@ -12,27 +12,9 @@ import Home from "../features/products/pages/Home"
 import ProductDetails from "../features/products/pages/ProductDetails"
 import SellerProductDetails from "../features/products/pages/SellerProductDetails"
 import Cart from "../features/cart/pages/Cart"
+import AppLayout from "./AppLayout"
 
 export const routes = createBrowserRouter([
-  {
-    path: "/",
-    element: <Home />,
-  },
-
-  {
-    path: "/cart",
-    element: (
-      <Protected>
-        <Cart />
-      </Protected>
-    ),
-  },
-  
-  {
-    path: "/product/:productId",
-    element: <ProductDetails />,
-  },
-
   {
     path: "/seller",
     element: (
@@ -81,5 +63,29 @@ export const routes = createBrowserRouter([
       </PublicOnly>
     ),
   },
-  
+
+  {
+    element: <AppLayout />,
+    children: [
+      {
+        path: "/",
+        element: <Home />,
+      },
+
+      {
+        path: "/cart",
+        element: (
+          <Protected>
+            <Cart />
+          </Protected>
+        ),
+      },
+
+      {
+        path: "/product/:productId",
+        element: <ProductDetails />,
+      },
+    ]
+  }
+
 ])
