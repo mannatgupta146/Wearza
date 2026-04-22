@@ -11,11 +11,21 @@ import PublicOnly from "../features/auth/components/PublicOnly"
 import Home from "../features/products/pages/Home"
 import ProductDetails from "../features/products/pages/ProductDetails"
 import SellerProductDetails from "../features/products/pages/SellerProductDetails"
+import Cart from "../features/cart/pages/Cart"
 
 export const routes = createBrowserRouter([
   {
     path: "/",
     element: <Home />,
+  },
+
+  {
+    path: "/cart",
+    element: (
+      <Protected>
+        <Cart />
+      </Protected>
+    ),
   },
   
   {
