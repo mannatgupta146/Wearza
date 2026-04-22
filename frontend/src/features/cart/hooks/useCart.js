@@ -12,18 +12,18 @@ export const useCart = () => {
     }
 
     const handleAddItem = async ({ productId, variantId, quantity }) => {
-        const response = await addToCartApi({ productId, variantId, quantity })
-        dispatch(addItem(response.item))
+        await addToCartApi({ productId, variantId, quantity })
+        await handleGetCart()
     }
 
     const handleRemoveItem = async ({ productId, variantId }) => {
-        const response = await removeFromCartApi({ productId, variantId })
-        dispatch(removeItem(response.item))
+        await removeFromCartApi({ productId, variantId })
+        await handleGetCart()
     }
 
     const handleUpdateItem = async ({ productId, variantId, quantity }) => {
-        const response = await updateItemInCartApi({ productId, variantId, quantity })
-        dispatch(updateItem(response.item))
+        await updateItemInCartApi({ productId, variantId, quantity })
+        await handleGetCart()
     }
 
     return {

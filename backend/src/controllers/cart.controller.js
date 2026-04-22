@@ -116,3 +116,51 @@ export const getCartController = async (req, res) => {
         cart 
     })
 }
+
+export const removeFromCartController = async (req, res) => {
+    try {
+        const { productId, variantId } = req.params
+        const userId = req.user.id
+
+        const cart = await cartModel.findOne({ user: userId })
+        if (!cart) return res.status(404).json({ success: false, message: "Cart not found" })
+
+        cart.items = cart.items.filter(
+            item => !(item.product.toString() === productId && item.variant.toString() === variantId)
+        )
+
+        await cart.save()
+        return res.status(200).json({ success: true, message: "Item removed from cart" })
+    } catch (error) {
+        return res.status(500).json({ success: false, message: "Internal server error" })
+    }
+}
+
+export const updateCartController = async (req, res) => {
+    try {
+        const { productId, variantId } = req.params
+        const { quantity } = req.body
+        const userId = req.user.id
+
+        const stock = await stockOfVariant(productId, variantId)
+        if (quantity > stock) {
+            return res.status(400).json({ success: false, message: `Only ${stock} left in stock` })
+        }
+
+        const cart = await cartModel.findOne({ user: userId })
+        if (!cart) return res.status(404).json({ success: false, message: "Cart not found" })
+
+        const itemIndex = cart.items.findIndex(
+            item => item.product.toString() === productId && item.variant.toString() === variantId
+        )
+
+        if (itemIndex === -1) return res.status(404).json({ success: false, message: "Item not found in cart" })
+
+        cart.items[itemIndex].quantity = quantity
+        await cart.save()
+
+        return res.status(200).json({ success: true, message: "Cart updated successfully" })
+    } catch (error) {
+        return res.status(500).json({ success: false, message: "Internal server error" })
+    }
+}

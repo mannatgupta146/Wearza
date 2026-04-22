@@ -517,9 +517,9 @@ const ProductDetails = () => {
                         })
                       }
                     }}
-                    className={`w-full rounded-2xl border py-4 text-xs font-bold uppercase tracking-[0.2em] transition-all duration-300 active:scale-[0.98] ${
+                    className={`w-full rounded-sm border py-4 text-xs font-bold uppercase tracking-[0.2em] transition-all duration-300 active:scale-[0.98] ${
                       isInStock 
-                        ? "border-white/10 bg-white/5 text-white hover:bg-white/10 hover:border-white/30" 
+                        ? "border-white/20 bg-white/5 text-white hover:bg-white/10 hover:border-white/40" 
                         : `border-white/5 bg-white/[0.02] text-white/40 cursor-pointer ${showStockError ? "animate-shake border-rose-500/30 text-rose-400" : ""}`
                     }`}
                   >
@@ -529,9 +529,9 @@ const ProductDetails = () => {
                   <button
                     type="button"
                     onClick={() => handleActionClick("buy_now")}
-                    className={`w-full rounded-2xl py-4 text-xs font-black uppercase tracking-[0.2em] transition-all duration-300 active:scale-[0.98] ${
+                    className={`w-full rounded-sm py-4 text-xs font-bold uppercase tracking-[0.2em] transition-all duration-300 active:scale-[0.98] ${
                       isInStock 
-                        ? "bg-gradient-to-r from-amber-400 via-orange-400 to-orange-500 text-black shadow-[0_10px_30px_rgba(251,191,36,0.25)] hover:brightness-110 hover:-translate-y-1" 
+                        ? "bg-gradient-to-r from-amber-400 to-orange-500 text-black shadow-lg hover:brightness-105 hover:-translate-y-0.5" 
                         : `bg-white/[0.04] text-white/50 border border-white/5 cursor-pointer ${showStockError ? "animate-shake border-rose-500/30 text-rose-400" : ""}`
                     }`}
                   >

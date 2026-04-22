@@ -1,7 +1,7 @@
 import { Router } from "express"
 import { authenticateUser } from "../middleware/auth.middleware.js"
 import { validateAddToCart } from "../validators/cart.validator.js"
-import { addToCartController, getCartController } from "../controllers/cart.controller.js"
+import { addToCartController, getCartController, removeFromCartController, updateCartController } from "../controllers/cart.controller.js"
 
 const cartRouter = Router()
 
@@ -17,22 +17,22 @@ cartRouter.get('/', authenticateUser, getCartController)
  * @route POST /cart/add/:productId/:variantId
  * @desc Add item to cart
  * @access Private
- * @argument productId - ID of the product to add to cart
- * @argument variantId - ID of the variant to add to cart
- * @argument quantity - Quantity of the variant to add to cart
  */
 
 cartRouter.post('/add/:productId/:variantId', authenticateUser, validateAddToCart, addToCartController)
 
 /**
- * @route POST api/cart/add/productId, variantId, quantity
- * @desc Add item to cart
+ * @route DELETE /cart/remove/:productId/:variantId
+ * @desc Remove item from cart
  * @access Private
- * @argument productId - ID of the product to add to cart
- * @argument variantId - ID of the variant to add to cart
- * @argument quantity - Quantity of the variant to add to cart
  */
+cartRouter.delete('/remove/:productId/:variantId', authenticateUser, removeFromCartController)
 
-cartRouter.post('/add/:productId/:variantId', authenticateUser, validateAddToCart, addToCartController)
+/**
+ * @route PUT /cart/update/:productId/:variantId
+ * @desc Update item quantity in cart
+ * @access Private
+ */
+cartRouter.put('/update/:productId/:variantId', authenticateUser, updateCartController)
 
 export default cartRouter
