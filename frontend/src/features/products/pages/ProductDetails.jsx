@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react"
 import { Link, useParams } from "react-router-dom"
 import { useProduct } from "../hooks/useProduct"
+import { useCart } from "../../cart/hooks/useCart"
 
 const ProductDetails = () => {
   const { productId } = useParams()
@@ -22,6 +23,7 @@ const ProductDetails = () => {
   const errorTimerRef = useRef(null)
 
   const { fetchProductDetails } = useProduct()
+  const { handleAddItem } = useCart()
 
   async function fetchDetails() {
     setLoading(true)
@@ -505,7 +507,16 @@ const ProductDetails = () => {
                 <div className="grid grid-cols-1 gap-4 pt-4 sm:grid-cols-2">
                   <button
                     type="button"
-                    onClick={() => handleActionClick("add_to_cart")}
+                    onClick={() => {
+                      handleActionClick("add_to_cart")
+                      if (isInStock) {
+                        handleAddItem({
+                          productId: product?._id,
+                          variantId: selectedVariant?._id,
+                          quantity,
+                        })
+                      }
+                    }}
                     className={`w-full rounded-2xl border py-4 text-xs font-bold uppercase tracking-[0.2em] transition-all duration-300 active:scale-[0.98] ${
                       isInStock 
                         ? "border-white/10 bg-white/5 text-white hover:bg-white/10 hover:border-white/30" 
