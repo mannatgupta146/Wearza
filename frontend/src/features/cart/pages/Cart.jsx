@@ -2,6 +2,7 @@ import React, { useMemo, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useCart } from '../hooks/useCart'
 import { Link } from 'react-router-dom'
+import { toast } from 'react-toastify'
 
 const Cart = () => {
     const cartItems = useSelector(state => state.cart.items)
@@ -41,6 +42,36 @@ const Cart = () => {
             if (variant?.images?.length > 0) return variant.images[0].url
         }
         return item.product?.images?.[0]?.url
+    }
+
+    const incrementCartItem = (item) => {
+        if (item.quantity < 10) {
+            handleUpdateItem({ productId: item.product?._id, variantId: item.variant, quantity: item.quantity + 1 })
+        } else {
+            toast.warning("Maximum order quantity is 10 units", {
+                toastId: `max-qty-${item._id}`,
+                position: "bottom-right",
+                autoClose: 2000,
+                hideProgressBar: true,
+                theme: "dark",
+                pauseOnHover: false,
+            })
+        }
+    }
+
+    const decrementCartItem = (item) => {
+        if (item.quantity > 1) {
+            handleUpdateItem({ productId: item.product?._id, variantId: item.variant, quantity: item.quantity - 1 })
+        } else {
+            toast.warning("Minimum order quantity is 1 unit", {
+                toastId: `min-qty-${item._id}`,
+                position: "bottom-right",
+                autoClose: 2000,
+                hideProgressBar: true,
+                theme: "dark",
+                pauseOnHover: false,
+            })
+        }
     }
 
     if (loading) {
@@ -140,16 +171,15 @@ const Cart = () => {
                                                     </div>
 
                                                     {/* Quantity Control */}
-                                                    <div className="flex items-center bg-white/[0.03] border border-white/10 rounded-2xl p-1.5 w-fit">
+                                                    <div className="flex items-center bg-black/40 border border-white/5 rounded-xl p-1 w-fit">
                                                         <button 
-                                                            onClick={() => item.quantity > 1 && handleUpdateItem({ productId: item.product?._id, variantId: item.variant, quantity: item.quantity - 1 })}
-                                                            className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white/5 text-white/30 hover:text-white transition-all disabled:opacity-10"
-                                                            disabled={item.quantity <= 1}
-                                                        >—</button>
-                                                        <span className="w-10 text-center text-sm font-black tabular-nums">{item.quantity}</span>
+                                                            onClick={() => decrementCartItem(item)}
+                                                            className={`w-9 h-9 flex items-center justify-center rounded-lg bg-white/5 transition-all hover:bg-white/10 active:scale-90 ${item.quantity <= 1 ? "opacity-20 cursor-not-allowed" : "text-white cursor-pointer"}`}
+                                                        >−</button>
+                                                        <span className="w-10 text-center text-sm font-black tabular-nums text-white">{item.quantity}</span>
                                                         <button 
-                                                            onClick={() => handleUpdateItem({ productId: item.product?._id, variantId: item.variant, quantity: item.quantity + 1 })}
-                                                            className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white/5 text-white/30 hover:text-white transition-all"
+                                                            onClick={() => incrementCartItem(item)}
+                                                            className={`w-9 h-9 flex items-center justify-center rounded-lg bg-white/5 transition-all hover:bg-white/10 active:scale-90 ${item.quantity >= 10 ? "opacity-20 cursor-not-allowed" : "text-white cursor-pointer"}`}
                                                         >+</button>
                                                     </div>
                                                 </div>

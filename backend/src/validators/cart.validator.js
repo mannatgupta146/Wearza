@@ -11,6 +11,13 @@ function validateRequest(req, res, next) {
 export const validateAddToCart = [
     param('productId').isMongoId().withMessage('Invalid product ID'),
     param('variantId').isMongoId().withMessage('Invalid variant ID'),
-    body('quantity').isInt({ min: 1 }).withMessage('Quantity must be at least 1'),
+    body('quantity').isInt({ min: 1, max: 10 }).withMessage('Quantity must be between 1 and 10'),
+    validateRequest
+]
+
+export const validateUpdateCart = [
+    param('productId').isMongoId().withMessage('Invalid product ID'),
+    param('variantId').isMongoId().withMessage('Invalid variant ID'),
+    body('quantity').isInt({ min: 1, max: 10 }).withMessage('Quantity must be between 1 and 10'),
     validateRequest
 ]

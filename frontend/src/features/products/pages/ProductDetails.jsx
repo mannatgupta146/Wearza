@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react"
 import { Link, useParams } from "react-router-dom"
+import { toast } from "react-toastify"
 import { useProduct } from "../hooks/useProduct"
 import { useCart } from "../../cart/hooks/useCart"
 
@@ -133,8 +134,35 @@ const ProductDetails = () => {
     setImageWithTransition(nextIndex)
   }
 
-  const incrementQuantity = () => setQuantity((prev) => Math.min(prev + 1, 10))
-  const decrementQuantity = () => setQuantity((prev) => Math.max(prev - 1, 1))
+  const incrementQuantity = () => {
+    if (quantity < 10) {
+      setQuantity((prev) => prev + 1)
+    } else {
+      toast.warning("Maximum order quantity is 10 units", {
+        toastId: "max-qty-reached",
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: true,
+        theme: "dark",
+        pauseOnHover: false,
+      })
+    }
+  }
+
+  const decrementQuantity = () => {
+    if (quantity > 1) {
+      setQuantity((prev) => prev - 1)
+    } else {
+      toast.warning("Minimum order quantity is 1 unit", {
+        toastId: "min-qty-reached",
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: true,
+        theme: "dark",
+        pauseOnHover: false,
+      })
+    }
+  }
 
   const handleShare = async () => {
     const pageUrl = window.location.href
@@ -321,7 +349,7 @@ const ProductDetails = () => {
                           type="button"
                           key={`${imageUrl}-${index}`}
                           onClick={() => setImageWithTransition(index)}
-                          className={`relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border-2 transition-all duration-300 bg-[#1a1a1c] ${
+                          className={`relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border-2 transition-all duration-300 bg-[#1a1a1c] p-1 ${
                             isActive
                               ? "border-amber-400 scale-105 shadow-[0_0_15px_rgba(251,191,36,0.25)]"
                               : "border-transparent opacity-60 hover:opacity-100 hover:scale-105"
@@ -470,8 +498,8 @@ const ProductDetails = () => {
                       <button
                         type="button"
                         onClick={decrementQuantity}
-                        className="h-9 w-9 rounded-lg bg-white/5 text-sm font-bold text-white transition-all hover:bg-white/10 active:scale-95 disabled:opacity-20"
-                        disabled={quantity <= 1 || !isInStock}
+                        className={`h-9 w-9 rounded-lg bg-white/5 text-sm font-bold text-white transition-all hover:bg-white/10 active:scale-95 ${quantity <= 1 ? "opacity-20 cursor-not-allowed" : "opacity-100 cursor-pointer"}`}
+                        disabled={!isInStock}
                         aria-label="Decrease quantity"
                       >
                         −
@@ -482,8 +510,8 @@ const ProductDetails = () => {
                       <button
                         type="button"
                         onClick={incrementQuantity}
-                        className="h-9 w-9 rounded-lg bg-white/5 text-sm font-bold text-white transition-all hover:bg-white/10 active:scale-95 disabled:opacity-20"
-                        disabled={quantity >= 10 || !isInStock}
+                        className={`h-9 w-9 rounded-lg bg-white/5 text-sm font-bold text-white transition-all hover:bg-white/10 active:scale-95 ${quantity >= 10 ? "opacity-20 cursor-not-allowed" : "opacity-100 cursor-pointer"}`}
+                        disabled={!isInStock}
                         aria-label="Increase quantity"
                       >
                         +

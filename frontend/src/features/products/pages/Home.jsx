@@ -123,10 +123,15 @@ const ProductCard = ({ product, navigate, formatCurrency }) => {
             </span>
           </div>
           
-          <div className={`flex h-8 w-8 items-center justify-center rounded-sm border border-white/5 bg-white/5 transition-all duration-500 ${isHovered ? "border-amber-400/30 text-amber-400 translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}>
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-            </svg>
+          <div className={`flex items-center gap-3 transition-all duration-700 ${isHovered ? "translate-x-0 opacity-100" : "-translate-x-4 opacity-0"}`}>
+            <span className="text-[9px] font-black uppercase tracking-[0.4em] text-amber-400">
+              Explore
+            </span>
+            <div className="flex h-6 w-6 items-center justify-center rounded-full border border-amber-400/20 bg-amber-400/10">
+              <svg className="h-3 w-3 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </div>
           </div>
         </div>
       </div>

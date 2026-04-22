@@ -62,13 +62,23 @@ export const addToCartController = async (req, res) => {
 
         if (existingItemIndex !== -1) {
             const currentQty = cart.items[existingItemIndex].quantity
-            if (currentQty + Number(quantity) > stock) {
+            const newTotalQty = currentQty + Number(quantity)
+            
+            // Check against both stock and the global limit of 10
+            if (newTotalQty > 10) {
+                return res.status(400).json({ 
+                    success: false,
+                    message: `Maximum 10 units allowed per item. You already have ${currentQty} in cart.` 
+                })
+            }
+
+            if (newTotalQty > stock) {
                 return res.status(400).json({ 
                     success: false,
                     message: `Only ${stock - currentQty} more left in stock. You already have ${currentQty} in cart.` 
                 })
             }
-            cart.items[existingItemIndex].quantity += Number(quantity)
+            cart.items[existingItemIndex].quantity = newTotalQty
             // Optionally update the price to the latest one
             cart.items[existingItemIndex].price = price
         } else {
