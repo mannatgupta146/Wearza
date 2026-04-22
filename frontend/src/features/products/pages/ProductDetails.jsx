@@ -251,7 +251,7 @@ const ProductDetails = () => {
           <section className="animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-2">
               <div className="space-y-4">
-                <div className="group relative aspect-[4/5] overflow-hidden rounded-2xl border border-white/10 bg-[#141416] shadow-2xl">
+                <div className="group relative aspect-square overflow-hidden rounded-2xl border border-white/10 bg-[#141416] shadow-2xl">
                   {displayedImage ? (
                     <>
                       {/* Deep Blur Background to fill aspect ratio */}
@@ -261,16 +261,18 @@ const ProductDetails = () => {
                         className="absolute inset-0 h-full w-full object-cover blur-3xl opacity-50 scale-110"
                         aria-hidden="true"
                       />
-                      {/* Main Contained Image */}
-                      <img
-                        src={displayedImage}
-                        alt={displayedTitle || "Product image"}
-                        className={`relative z-10 h-full w-full object-contain transition-all duration-700 group-hover:scale-[1.02] ${
-                          isImageTransitioning
-                            ? "opacity-0 blur-sm"
-                            : "opacity-100 blur-0"
-                        }`}
-                      />
+                      {/* Main Contained Image with Padding */}
+                      <div className="relative z-10 flex h-full w-full items-center justify-center p-7">
+                        <img
+                          src={displayedImage}
+                          alt={displayedTitle || "Product image"}
+                          className={`max-h-full max-w-full object-contain transition-all duration-700 group-hover:scale-[1.05] ${
+                            isImageTransitioning
+                              ? "opacity-0 blur-sm"
+                              : "opacity-100 blur-0"
+                          }`}
+                        />
+                      </div>
                     </>
                   ) : (
                     <div className="flex h-full items-center justify-center text-sm text-gray-500">

@@ -2,13 +2,21 @@ import React, { useState, useEffect } from "react"
 import { useSelector } from "react-redux"
 import { Link, NavLink, useNavigate } from "react-router-dom"
 import { useAuth } from "../../auth/hooks/useAuth"
+import { useCart } from "../../cart/hooks/useCart"
 
 const Nav = () => {
     const navigate = useNavigate()
     const { handleLogout } = useAuth()
+    const { handleGetCart } = useCart()
     const user = useSelector((state) => state.auth.user)
     const cartItems = useSelector(state => state.cart.items)
     const [scrolled, setScrolled] = useState(false)
+
+    useEffect(() => {
+        if (user) {
+            handleGetCart()
+        }
+    }, [user])
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20)
@@ -81,14 +89,14 @@ const Nav = () => {
                         <div className="flex items-center gap-4">
                             {/* User Profile Info */}
                             <div className="hidden lg:flex flex-col items-end">
-                                <span className="text-[10px] font-bold text-white uppercase tracking-wider">{user.fullname}</span>
-                                <span className="text-[8px] text-amber-400/60 uppercase tracking-widest font-black">{user.role}</span>
+                                <span className="text-[11px] font-bold text-white uppercase tracking-wider">{user.fullname}</span>
+                                <span className="text-[9px] text-amber-400/60 uppercase tracking-widest font-bold">{user.role}</span>
                             </div>
                             
                             {/* Logout - Premium Button */}
                             <button
                                 onClick={onLogout}
-                                className="px-5 py-2 rounded-sm bg-white/5 border border-white/10 text-[9px] font-black uppercase tracking-widest text-white hover:bg-rose-500/10 hover:text-rose-400 hover:border-rose-500/30 transition-all active:scale-[0.95]"
+                                className="px-5 py-2 rounded-sm bg-white/5 border border-white/10 text-[11px] font-bold uppercase tracking-widest text-white hover:bg-rose-500/10 hover:text-rose-400 hover:border-rose-500/30 transition-all active:scale-[0.95]"
                             >
                                 Logout
                             </button>
@@ -96,7 +104,7 @@ const Nav = () => {
                     ) : (
                         <Link
                             to="/login"
-                            className="px-6 py-2 rounded-sm bg-gradient-to-r from-amber-400 to-orange-500 text-black text-[9px] font-black uppercase tracking-widest shadow-lg hover:brightness-110 transition-all"
+                            className="px-8 py-2 rounded-sm border border-white/10 bg-white/5 text-white text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-white/10 hover:border-amber-400/50 hover:text-amber-400 transition-all duration-500 active:scale-[0.95]"
                         >
                             Login
                         </Link>
