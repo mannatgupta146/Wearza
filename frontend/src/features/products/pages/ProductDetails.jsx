@@ -1,11 +1,14 @@
 import React, { useEffect, useMemo, useRef, useState } from "react"
-import { Link, useParams } from "react-router-dom"
+import { Link, useParams, useSearchParams } from "react-router-dom"
 import { toast } from "react-toastify"
 import { useProduct } from "../hooks/useProduct"
 import { useCart } from "../../cart/hooks/useCart"
+import InventoryNotification from "../components/InventoryNotification.jsx"
+import AlertNotification from "../../Shared/components/AlertNotification.jsx"
 
 const ProductDetails = () => {
   const { productId } = useParams()
+  const [searchParams, setSearchParams] = useSearchParams()
 
   const [product, setProduct] = useState(null)
   const [error, setError] = useState("")
@@ -15,9 +18,8 @@ const ProductDetails = () => {
   const [quantity, setQuantity] = useState(1)
   const [isWishlisted, setIsWishlisted] = useState(false)
   const [copied, setCopied] = useState(false)
-  const [showStockError, setShowStockError] = useState(false)
   const [selectedAttributes, setSelectedAttributes] = useState({})
-  const [selectedVariant, setSelectedVariant] = useState(null) // Ensure selectedVariant is initialized to null
+  const [selectedVariant, setSelectedVariant] = useState(null)
 
   const transitionTimerRef = useRef(null)
   const copyTimerRef = useRef(null)
@@ -36,7 +38,16 @@ const ProductDetails = () => {
       setProduct(data.product)
       setSelectedImageIndex(0)
       setQuantity(1)
-      setSelectedVariant(null)
+      
+      // Handle variant from URL
+      const variantIdFromUrl = searchParams.get("variant")
+      if (variantIdFromUrl && data.product.variants) {
+        const matchingVariant = data.product.variants.find(v => v._id === variantIdFromUrl)
+        if (matchingVariant) {
+          setSelectedVariant(matchingVariant)
+          setSelectedAttributes(matchingVariant.attributes || {})
+        }
+      }
     } else {
       setError(data.message || "Failed to fetch product details")
     }
@@ -138,13 +149,15 @@ const ProductDetails = () => {
     if (quantity < 10) {
       setQuantity((prev) => prev + 1)
     } else {
-      toast.warning("Maximum order quantity is 10 units", {
+      toast(AlertNotification, {
         toastId: "max-qty-reached",
+        data: { message: "Maximum order quantity is 10 units", type: "warning" },
         position: "bottom-right",
-        autoClose: 2000,
-        hideProgressBar: true,
-        theme: "dark",
-        pauseOnHover: false,
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeButton: false,
+        className: "!bg-[#09090a]/95 !border !border-amber-500/20 !rounded-[1.2rem] !p-0 !shadow-[0_20px_40px_rgba(0,0,0,0.8)] !backdrop-blur-3xl !mb-6 !mr-6 !w-auto !min-w-0 !overflow-hidden",
+        progressClassName: "!bg-amber-500 !h-0.5 !bottom-1 !left-6 !right-6",
       })
     }
   }
@@ -153,13 +166,15 @@ const ProductDetails = () => {
     if (quantity > 1) {
       setQuantity((prev) => prev - 1)
     } else {
-      toast.warning("Minimum order quantity is 1 unit", {
+      toast(AlertNotification, {
         toastId: "min-qty-reached",
+        data: { message: "Minimum order quantity is 1 unit", type: "warning" },
         position: "bottom-right",
-        autoClose: 2000,
-        hideProgressBar: true,
-        theme: "dark",
-        pauseOnHover: false,
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeButton: false,
+        className: "!bg-[#09090a]/95 !border !border-amber-500/20 !rounded-[1.2rem] !p-0 !shadow-[0_20px_40px_rgba(0,0,0,0.8)] !backdrop-blur-3xl !mb-6 !mr-6 !w-auto !min-w-0 !overflow-hidden",
+        progressClassName: "!bg-amber-500 !h-0.5 !bottom-1 !left-6 !right-6",
       })
     }
   }
@@ -212,9 +227,11 @@ const ProductDetails = () => {
       if (Object.keys(newAttrs).length > 0 && matchingVariant) {
         setSelectedVariant(matchingVariant)
         setSelectedImageIndex(0)
+        setSearchParams({ variant: matchingVariant._id }, { replace: true })
       } else {
         setSelectedVariant(null)
         setSelectedImageIndex(0)
+        setSearchParams({}, { replace: true })
       }
 
       return newAttrs
@@ -226,9 +243,17 @@ const ProductDetails = () => {
 
   const handleActionClick = (actionType) => {
     if (!isInStock) {
-      if (errorTimerRef.current) clearTimeout(errorTimerRef.current)
-      setShowStockError(true)
-      errorTimerRef.current = setTimeout(() => setShowStockError(false), 500)
+      toast(InventoryNotification, {
+        toastId: "inventory-alert",
+        data: { title: displayedTitle },
+        position: "top-right",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeButton: false,
+        theme: "dark",
+        className: "!bg-[#09090a]/95 !border !border-white/10 !rounded-[1.2rem] !p-0 !shadow-[0_20px_40px_rgba(0,0,0,0.8)] !backdrop-blur-3xl !mr-6 !mt-6 !w-auto !min-w-0 !overflow-hidden",
+        progressClassName: "!bg-gradient-to-r !from-amber-400 !to-orange-500 !h-0.5 !bottom-1 !left-6 !right-6",
+      })
       return
     }
     
@@ -491,27 +516,37 @@ const ProductDetails = () => {
                   <div className="flex items-center justify-between rounded-2xl border border-white/5 bg-white/[0.03] p-5">
                     <div className="space-y-1.5">
                       <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Quantity</p>
-                      <p className="text-sm text-gray-500 font-medium tracking-tight">Adjust units</p>
+                      <p className="text-sm text-gray-500 font-medium tracking-tight">Adjust units (Limit 10)</p>
                     </div>
 
                     <div className="flex items-center gap-4 bg-black/40 rounded-xl p-1 border border-white/5">
                       <button
                         type="button"
-                        onClick={decrementQuantity}
-                        className={`h-9 w-9 rounded-lg bg-white/5 text-sm font-bold text-white transition-all hover:bg-white/10 active:scale-95 ${quantity <= 1 ? "opacity-20 cursor-not-allowed" : "opacity-100 cursor-pointer"}`}
-                        disabled={!isInStock}
+                        onClick={() => {
+                          if (!isInStock) {
+                            handleActionClick("adjust_quantity")
+                            return
+                          }
+                          decrementQuantity()
+                        }}
+                        className={`h-9 w-9 rounded-lg bg-white/5 text-sm font-bold text-white transition-all hover:bg-white/10 active:scale-95 ${!isInStock ? "opacity-20" : quantity <= 1 ? "opacity-20 cursor-not-allowed" : "opacity-100 cursor-pointer"}`}
                         aria-label="Decrease quantity"
                       >
                         −
                       </button>
-                      <span className="min-w-6 text-center text-sm font-bold text-white">
+                      <span className={`min-w-6 text-center text-sm font-bold ${!isInStock ? "text-white/20" : "text-white"}`}>
                         {quantity}
                       </span>
                       <button
                         type="button"
-                        onClick={incrementQuantity}
-                        className={`h-9 w-9 rounded-lg bg-white/5 text-sm font-bold text-white transition-all hover:bg-white/10 active:scale-95 ${quantity >= 10 ? "opacity-20 cursor-not-allowed" : "opacity-100 cursor-pointer"}`}
-                        disabled={!isInStock}
+                        onClick={() => {
+                          if (!isInStock) {
+                            handleActionClick("adjust_quantity")
+                            return
+                          }
+                          incrementQuantity()
+                        }}
+                        className={`h-9 w-9 rounded-lg bg-white/5 text-sm font-bold text-white transition-all hover:bg-white/10 active:scale-95 ${!isInStock ? "opacity-20" : quantity >= 10 ? "opacity-20 cursor-not-allowed" : "opacity-100 cursor-pointer"}`}
                         aria-label="Increase quantity"
                       >
                         +
@@ -519,20 +554,6 @@ const ProductDetails = () => {
                     </div>
                   </div>
                 </div>
-
-                {!isInStock && (
-                  <div className={`animate-in fade-in slide-in-from-top-2 duration-500 rounded-2xl border border-rose-500/20 bg-rose-500/5 p-4 flex items-center gap-4 transition-all ${showStockError ? "animate-shake border-rose-500/40 bg-rose-500/10" : ""}`}>
-                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-all ${showStockError ? "bg-rose-500 text-white scale-110" : "bg-rose-500/20 text-rose-400"}`}>
-                      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className={`text-[10px] font-black uppercase tracking-[0.2em] transition-colors ${showStockError ? "text-rose-400" : "text-rose-500/70"}`}>Inventory Alert</p>
-                      <p className={`text-xs font-medium transition-colors ${showStockError ? "text-white" : "text-rose-300/70"}`}> This item is currently out of stock and cannot be added to your cart.</p>
-                    </div>
-                  </div>
-                )}
 
                 <div className="grid grid-cols-1 gap-4 pt-4 sm:grid-cols-2">
                   <button
@@ -544,13 +565,15 @@ const ProductDetails = () => {
                           productId: product?._id,
                           variantId: selectedVariant?._id,
                           quantity,
+                          title: displayedTitle,
+                          image: displayedImage,
                         })
                       }
                     }}
                     className={`w-full rounded-sm border py-4 text-xs font-bold uppercase tracking-[0.2em] transition-all duration-300 active:scale-[0.98] ${
                       isInStock 
                         ? "border-white/20 bg-white/5 text-white hover:bg-white/10 hover:border-white/40" 
-                        : `border-white/5 bg-white/[0.02] text-white/40 cursor-pointer ${showStockError ? "animate-shake border-rose-500/30 text-rose-400" : ""}`
+                        : "border-white/5 bg-white/[0.02] text-white/40"
                     }`}
                   >
                     {isInStock ? "Add to Cart" : "Out of Stock"}
@@ -562,7 +585,7 @@ const ProductDetails = () => {
                     className={`w-full rounded-sm py-4 text-xs font-bold uppercase tracking-[0.2em] transition-all duration-300 active:scale-[0.98] ${
                       isInStock 
                         ? "bg-gradient-to-r from-amber-400 to-orange-500 text-black shadow-lg hover:brightness-105 hover:-translate-y-0.5" 
-                        : `bg-white/[0.04] text-white/50 border border-white/5 cursor-pointer ${showStockError ? "animate-shake border-rose-500/30 text-rose-400" : ""}`
+                        : "bg-white/[0.04] text-white/50 border border-white/5"
                     }`}
                   >
                     {isInStock ? "Buy Now" : "Sold Out"}

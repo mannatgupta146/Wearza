@@ -25,6 +25,7 @@ const App = () => {
         closeOnClick
         pauseOnHover
         theme="dark"
+        closeButton={false}
       />
     </>
   )
