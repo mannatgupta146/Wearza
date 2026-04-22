@@ -1,9 +1,17 @@
 import { Router } from "express"
 import { authenticateUser } from "../middleware/auth.middleware.js"
 import { validateAddToCart } from "../validators/cart.validator.js"
-import { addToCartController } from "../controllers/cart.controller.js"
+import { addToCartController, getCartController } from "../controllers/cart.controller.js"
 
 const cartRouter = Router()
+
+/**
+ * @route GET /cart
+ * @desc Get user's cart
+ * @access Private
+ */
+
+cartRouter.get('/', authenticateUser, getCartController)
 
 /**
  * @route POST /cart/add/:productId/:variantId

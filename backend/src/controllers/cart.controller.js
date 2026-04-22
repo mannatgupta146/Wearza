@@ -100,3 +100,19 @@ export const addToCartController = async (req, res) => {
         })
     }
 }
+
+export const getCartController = async (req, res) => {
+    const user = req.user
+
+    let cart = await cartModel.findOne({ user: user._id }).populate("items.product")
+
+    if (!cart) {
+        cart = await cartModel.create({ user: user._id })
+    }
+
+    return res.status(200).json({ 
+        success: true,
+        message: "Cart fetched successfully",
+        cart 
+    })
+}
