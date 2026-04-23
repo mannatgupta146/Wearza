@@ -31,9 +31,34 @@ const Cart = () => {
     }
 
     const getVariantLabel = (item) => {
-        if (!item.variant || !item.product?.variants) return null
+        if (!item.variant || !item.product?.variants) return []
         const v = item.product.variants.find(v => v._id === item.variant)
-        return v?.attributes ? Object.values(v.attributes).join(' / ') : null
+        return v?.attributes ? Object.entries(v.attributes) : []
+    }
+
+    const getPriceAnalysis = (item) => {
+        if (!item.product || !item.variant || !item.price) return null
+        
+        const currentVariant = item.product.variants?.find(v => v._id === item.variant)
+        const currentPrice = currentVariant?.price?.amount || item.product.price?.amount
+        const savedPrice = item.price.amount
+
+        if (!currentPrice || !savedPrice) return null
+
+        if (currentPrice < savedPrice) {
+            return {
+                type: 'drop',
+                message: `Price dropped by ${formatCurrency(savedPrice - currentPrice)}!`,
+                color: 'text-emerald-400'
+            }
+        } else if (currentPrice > savedPrice) {
+            return {
+                type: 'increase',
+                message: `Price increased by ${formatCurrency(currentPrice - savedPrice)}, Buy Fast!`,
+                color: 'text-rose-500'
+            }
+        }
+        return null
     }
 
     const getItemImage = (item) => {
@@ -119,25 +144,44 @@ const Cart = () => {
 
                         <div className="space-y-16">
                             {cartItems.map((item) => (
-                                <div key={item._id} className="group relative flex flex-col sm:flex-row gap-10 pb-16 border-b border-white/[0.05]">
+                                 <div key={item._id} className="group relative flex flex-col lg:flex-row gap-12 pb-16 border-b border-white/[0.05] transition-all duration-700">
                                     {/* Image Section */}
-                                    <div className="h-72 w-full sm:w-56 shrink-0 bg-neutral-900 rounded-3xl overflow-hidden relative border border-white/[0.05] group-hover:border-amber-400/30 transition-colors duration-500">
+                                    <div className="h-80 w-full lg:w-64 shrink-0 bg-[#09090a] rounded-[2.5rem] overflow-hidden relative border border-white/[0.05] group-hover:border-amber-400/20 transition-all duration-700 group-hover:shadow-[0_20px_50px_rgba(0,0,0,0.4)]">
                                         <img 
                                             src={getItemImage(item)} 
                                             alt={item.product?.title}
-                                            className="h-full w-full object-contain opacity-80 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105 p-4"
+                                            className="h-full w-full object-contain opacity-90 group-hover:opacity-100 transition-all duration-700 group-hover:scale-110 p-6"
                                         />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60" />
+                                        
+                                        {/* Quick Actions Overlay (Optional/Future) */}
+                                        <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                                            <button 
+                                                onClick={() => handleRemoveItem({ productId: item.product?._id, variantId: item.variant })}
+                                                className="p-3 bg-black/60 backdrop-blur-xl text-white/40 hover:text-rose-500 border border-white/10 rounded-2xl transition-all hover:scale-110 active:scale-95"
+                                            >
+                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </button>
+                                        </div>
                                     </div>
 
                                     {/* Details */}
                                     <div className="flex-1 flex flex-col py-2">
-                                        <div className="flex justify-between items-start mb-6">
-                                            <div>
-                                                <h3 className="text-2xl font-light tracking-wide mb-2 uppercase group-hover:text-amber-400 transition-colors">{item.product?.title}</h3>
-                                                {getVariantLabel(item) && (
-                                                    <div className="inline-flex items-center px-3 py-1 rounded-full bg-amber-400/10 border border-amber-400/20 text-[9px] text-amber-400 uppercase tracking-widest font-black">
-                                                        {getVariantLabel(item)}
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div className="space-y-1">
+                                                <h3 className="text-2xl font-light tracking-tight text-white group-hover:text-amber-400 transition-colors duration-500">{item.product?.title}</h3>
+                                                {getVariantLabel(item).length > 0 && (
+                                                    <div className="flex flex-wrap gap-4 items-center">
+                                                        {getVariantLabel(item).map(([key, value]) => (
+                                                            <div key={key} className="flex items-center gap-2">
+                                                                <span className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-black">{key} :</span>
+                                                                <div className="inline-flex items-center px-3 py-1 rounded-lg border border-amber-400/20 bg-amber-400/5 text-[9px] uppercase tracking-widest font-black text-amber-400">
+                                                                    {value}
+                                                                </div>
+                                                            </div>
+                                                        ))}
                                                     </div>
                                                 )}
                                             </div>
@@ -151,49 +195,58 @@ const Cart = () => {
                                             </button>
                                         </div>
 
-                                        <p className="text-xs text-white/50 font-light line-clamp-3 leading-relaxed mb-8 max-w-xl">
+                                        <p className="text-xs text-white/30 font-light line-clamp-2 leading-relaxed mb-8 max-w-xl">
                                             {item.product?.description}
                                         </p>
 
-                                        <div className="mt-auto flex flex-wrap items-end justify-between gap-8">
+                                        <div className="mt-auto flex flex-wrap items-center justify-between gap-10">
                                             <div className="space-y-6">
                                                 {/* Price Display */}
-                                                <div className="flex items-baseline gap-4">
+                                                <div className="space-y-2">
+                                                    <div className="flex items-baseline gap-4">
                                                         <span className="text-3xl font-light tracking-tighter text-white">
                                                             {formatCurrency(item.price?.amount || 0)}
                                                         </span>
-                                                        <span className="text-sm text-white/30 line-through font-light">
+                                                        <span className="text-sm text-white/20 line-through font-light">
                                                             {formatCurrency((item.price?.amount || 0) * 1.5)}
                                                         </span>
-                                                        <span className="text-[10px] font-black uppercase tracking-widest text-amber-400/80">
+                                                        <span className="text-[10px] font-black uppercase tracking-widest text-amber-400/60">
                                                             33% OFF
                                                         </span>
                                                     </div>
 
-                                                    {/* Quantity Control */}
-                                                    <div className="flex items-center bg-black/40 border border-white/5 rounded-xl p-1 w-fit">
-                                                        <button 
-                                                            onClick={() => decrementCartItem(item)}
-                                                            className={`w-9 h-9 flex items-center justify-center rounded-lg bg-white/5 transition-all hover:bg-white/10 active:scale-90 ${item.quantity <= 1 ? "opacity-20 cursor-not-allowed" : "text-white cursor-pointer"}`}
-                                                        >−</button>
-                                                        <span className="w-10 text-center text-sm font-black tabular-nums text-white">{item.quantity}</span>
-                                                        <button 
-                                                            onClick={() => incrementCartItem(item)}
-                                                            className={`w-9 h-9 flex items-center justify-center rounded-lg bg-white/5 transition-all hover:bg-white/10 active:scale-90 ${item.quantity >= 10 ? "opacity-20 cursor-not-allowed" : "text-white cursor-pointer"}`}
-                                                        >+</button>
-                                                    </div>
+                                                    {getPriceAnalysis(item) && (
+                                                        <div className={`flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.15em] ${getPriceAnalysis(item).color} animate-pulse`}>
+                                                            <span className="w-1 h-1 rounded-full bg-current" />
+                                                            {getPriceAnalysis(item).message}
+                                                        </div>
+                                                    )}
                                                 </div>
 
-                                                {/* Total for this item */}
-                                                <div className="text-right p-4 rounded-3xl bg-amber-400/[0.02] border border-amber-400/5">
-                                                    <p className="text-[9px] text-white/30 uppercase tracking-[0.3em] font-black mb-2">Item Total</p>
-                                                    <p className="text-3xl font-light tracking-tighter text-amber-400">
-                                                        {formatCurrency((item.price?.amount || 0) * item.quantity)}
-                                                    </p>
+                                                {/* Quantity Control */}
+                                                <div className="flex items-center bg-black/40 border border-white/5 rounded-xl p-1 w-fit">
+                                                    <button 
+                                                        onClick={() => decrementCartItem(item)}
+                                                        className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all ${item.quantity <= 1 ? "opacity-10 cursor-not-allowed" : "text-white/40 hover:text-white hover:bg-white/5 active:scale-90"}`}
+                                                    >−</button>
+                                                    <span className="w-10 text-center text-sm font-black tabular-nums text-white">{item.quantity}</span>
+                                                    <button 
+                                                        onClick={() => incrementCartItem(item)}
+                                                        className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all ${item.quantity >= 10 ? "opacity-10 cursor-not-allowed" : "text-white/40 hover:text-white hover:bg-white/5 active:scale-90"}`}
+                                                    >+</button>
                                                 </div>
+                                            </div>
+
+                                            {/* Item Total */}
+                                            <div className="text-right">
+                                                <p className="text-[9px] text-white/20 uppercase tracking-[0.3em] font-black mb-1">Item Total</p>
+                                                <p className="text-3xl font-light tracking-tighter text-amber-400">
+                                                    {formatCurrency((item.price?.amount || 0) * item.quantity)}
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                 </div>
                             ))}
                         </div>
                     </div>
