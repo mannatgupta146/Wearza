@@ -325,7 +325,7 @@ const Cart = () => {
                     </div>
 
                     {/* Summary Section */}
-                    <div className="w-full lg:w-[350px] shrink-0 h-full">
+                    <div className="w-full lg:w-[350px] shrink-0 h-full lg:sticky lg:top-32">
                         <div className="h-full">
                             <div className="bg-[#050505] border border-white/[0.08] rounded-xl p-5 shadow-[0_30px_100px_rgba(0,0,0,0.8)] relative overflow-hidden flex flex-col group/summary hover:border-amber-400/20 transition-all duration-700 h-full">
                                 <div className="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 bg-amber-400/5 rounded-full blur-3xl group-hover/summary:bg-amber-400/10 transition-all duration-700" />
