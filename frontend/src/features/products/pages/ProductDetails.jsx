@@ -110,6 +110,8 @@ const ProductDetails = () => {
   const displayedTitle = selectedVariant?.title || product?.title
   const displayedPrice =
     selectedVariant?.price?.amount || product?.price?.amount
+  const displayedMrp =
+    selectedVariant?.price?.mrp || product?.price?.mrp
   const displayedStock = selectedVariant?.stock || product?.stock || 0
   const isInStock = displayedStock > 0
 
@@ -460,12 +462,21 @@ const ProductDetails = () => {
                     <span className="text-4xl font-black text-amber-400 tracking-tighter">
                       {formatCurrency(displayedPrice)}
                     </span>
-                    <span className="text-sm font-medium text-gray-500 line-through decoration-gray-600">
-                      {formatCurrency(displayedPrice * 1.5)}
-                    </span>
-                    <span className="rounded-md bg-green-500/10 px-2 py-0.5 text-[10px] font-bold uppercase text-green-400 border border-green-500/20">
-                      33% Off
-                    </span>
+                    {displayedMrp && displayedMrp > displayedPrice && (
+                      <>
+                        <span className="text-sm font-medium text-gray-500 line-through decoration-gray-600">
+                          {formatCurrency(displayedMrp)}
+                        </span>
+                        <div className="flex flex-col">
+                            <span className="rounded-md bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold uppercase text-emerald-400 border border-emerald-500/20">
+                            {Math.round(((displayedMrp - displayedPrice) / displayedMrp) * 100)}% Off
+                            </span>
+                            <span className="text-[9px] font-bold text-gray-500 uppercase tracking-tighter ml-1">
+                                Saving {formatCurrency(displayedMrp - displayedPrice)}
+                            </span>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
 

@@ -5,6 +5,10 @@ const priceSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    mrp: {
+        type: Number,
+        required: false
+    },
     currency: {
         type: String,
         enum: ["INR", "USD", "EUR", "GBP", "JPY"],
@@ -12,7 +16,7 @@ const priceSchema = new mongoose.Schema({
     }
 },{
     _id: false,
-    _v: false
+    versionKey: false
 })
 
 export default priceSchema

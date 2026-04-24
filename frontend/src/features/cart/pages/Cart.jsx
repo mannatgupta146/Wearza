@@ -19,7 +19,27 @@ const Cart = () => {
         fetch()
     }, [])
 
-    const subtotal = totalPrice || 0
+    const getCurrentPricing = (item) => {
+        const variants = item.product?.variants;
+        const variantObj = Array.isArray(variants) 
+            ? variants.find(v => v._id === item.variant) 
+            : (variants?._id === item.variant ? variants : null);
+        
+        const currentPrice = (variantObj?.price || item.product?.price)?.amount || item.price.amount;
+        const savedPrice = item.price.amount;
+        const mrp = item.price?.mrp;
+        const isPriceDropped = currentPrice < savedPrice;
+        
+        return { currentPrice, savedPrice, mrp, isPriceDropped };
+    };
+
+    const subtotal = useMemo(() => {
+        if (!cart) return 0;
+        return cart.reduce((total, item) => {
+            const { currentPrice } = getCurrentPricing(item);
+            return total + (currentPrice * item.quantity);
+        }, 0);
+    }, [cart]);
 
     const formatCurrency = (amount) => {
         return new Intl.NumberFormat('en-IN', {
@@ -140,12 +160,12 @@ const Cart = () => {
     }
 
     return (
-        <div className="h-screen bg-black text-white pt-32 pb-10 px-6 sm:px-10 lg:px-16 overflow-hidden">
-            <div className="max-w-6xl mx-auto h-full flex flex-col">
-                <div className="flex flex-col lg:flex-row gap-12 lg:gap-24 items-start h-full overflow-hidden">
+        <div className="min-h-screen bg-black text-white pt-32 pb-10 px-6 sm:px-10 lg:px-16 overflow-x-hidden">
+            <div className="max-w-6xl mx-auto flex flex-col h-full">
+                <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start">
                     
                     {/* Items Section - Independently Scrollable */}
-                    <div className="flex-1 h-full overflow-y-auto pr-4 custom-scrollbar">
+                    <div className="flex-1 w-full min-w-0">
                         <header className="mb-12">
                             <h1 className="text-4xl font-extralight tracking-[0.05em] uppercase mb-4">
                                 Shopping <span className="text-amber-400">Bag</span>
@@ -159,25 +179,13 @@ const Cart = () => {
                             {cart.map((item) => (
                                  <div key={item._id} className="group relative flex flex-col lg:flex-row gap-12 pb-16 border-b border-white/[0.05] transition-all duration-700">
                                     {/* Image Section */}
-                                    <div className="h-80 w-full lg:w-64 shrink-0 bg-[#09090a] rounded-[2.5rem] overflow-hidden relative border border-white/[0.05] group-hover:border-amber-400/20 transition-all duration-700 group-hover:shadow-[0_20px_50px_rgba(0,0,0,0.4)]">
+                                    <div className="group/img h-80 w-full lg:w-64 shrink-0 bg-[#09090a] rounded-[2.5rem] overflow-hidden relative border border-white/[0.05] hover:border-amber-400/20 transition-all duration-700 hover:shadow-[0_20px_50px_rgba(0,0,0,0.4)]">
                                         <img 
                                             src={getItemImage(item)} 
                                             alt={item.product?.title}
-                                            className="h-full w-full object-contain opacity-90 group-hover:opacity-100 transition-all duration-700 group-hover:scale-110 p-6"
+                                            className="h-full w-full object-contain opacity-90 group-hover/img:opacity-100 transition-all duration-700 group-hover/img:scale-110 p-6"
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60" />
-                                        
-                                        {/* Quick Actions Overlay (Optional/Future) */}
-                                        <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                                            <button 
-                                                onClick={() => handleRemoveItem({ productId: item.product?._id, variantId: item.variant })}
-                                                className="p-3 bg-black/60 backdrop-blur-xl text-white/40 hover:text-rose-500 border border-white/10 rounded-2xl transition-all hover:scale-110 active:scale-95"
-                                            >
-                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                </svg>
-                                            </button>
-                                        </div>
                                     </div>
 
                                     {/* Details */}
@@ -212,52 +220,104 @@ const Cart = () => {
                                             {item.product?.description}
                                         </p>
 
-                                        <div className="mt-auto flex flex-wrap items-center justify-between gap-10">
-                                            <div className="space-y-6">
-                                                {/* Price Display */}
-                                                <div className="space-y-2">
-                                                    <div className="flex items-baseline gap-4">
-                                                        <span className="text-3xl font-light tracking-tighter text-white">
-                                                            {formatCurrency(item.price?.amount || 0)}
-                                                        </span>
-                                                        <span className="text-sm text-white/20 line-through font-light">
-                                                            {formatCurrency((item.price?.amount || 0) * 1.5)}
-                                                        </span>
-                                                        <span className="text-[10px] font-black uppercase tracking-widest text-amber-400/60">
-                                                            33% OFF
-                                                        </span>
-                                                    </div>
+                                         <div className="mt-auto grid grid-cols-1 xl:grid-cols-[1fr_auto] items-end gap-12">
+                                             <div className="space-y-8">
+                                                  {/* Price Display */}
+                                                  <div className="space-y-4">
+                                                      <div className="flex flex-col gap-1.5">
+                                                          {(() => {
+                                                              const { currentPrice, savedPrice, mrp } = getCurrentPricing(item);
+                                                              const isPriceDropped = currentPrice < savedPrice;
+                                                              const isPriceIncreased = currentPrice > savedPrice;
 
-                                                    {getPriceAnalysis(item) && (
-                                                        <div className={`flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.15em] ${getPriceAnalysis(item).color} animate-pulse`}>
-                                                            <span className="w-1 h-1 rounded-full bg-current" />
-                                                            {getPriceAnalysis(item).message}
-                                                        </div>
-                                                    )}
-                                                </div>
+                                                              return (
+                                                                  <>
+                                                                      <div className="flex items-baseline gap-3">
+                                                                          <span className="text-5xl font-extralight tracking-tighter text-white transition-all duration-700">
+                                                                              {formatCurrency(currentPrice)}
+                                                                          </span>
+                                                                          {isPriceDropped && (
+                                                                              <span className="text-base text-white/30 line-through font-normal decoration-white/60">
+                                                                                  {formatCurrency(savedPrice)}
+                                                                              </span>
+                                                                          )}
+                                                                          {isPriceIncreased && (
+                                                                              <span className="text-xs text-white/20 font-light">
+                                                                                  from {formatCurrency(savedPrice)}
+                                                                              </span>
+                                                                          )}
+                                                                      </div>
+                                                                      {isPriceDropped && (
+                                                                          <div className="flex items-center gap-2 bg-emerald-400/5 px-3 py-1 rounded-full w-fit animate-pulse">
+                                                                              <div className="w-1 h-1 rounded-full bg-emerald-400" />
+                                                                              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-400">
+                                                                                  Price Dropped
+                                                                              </span>
+                                                                          </div>
+                                                                      )}
+                                                                      {isPriceIncreased && (
+                                                                          <div className="flex items-center gap-2 bg-rose-500/10 px-3 py-1 rounded-full w-fit animate-pulse border border-rose-500/20">
+                                                                              <div className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                                                                              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-rose-500">
+                                                                                  Price Rising
+                                                                              </span>
+                                                                          </div>
+                                                                      )}
+                                                                      {!isPriceDropped && !isPriceIncreased && mrp && mrp > currentPrice && (
+                                                                          <span className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-400/60">
+                                                                              {Math.round(((mrp - currentPrice) / mrp) * 100)}% Special Offer
+                                                                          </span>
+                                                                      )}
+                                                                  </>
+                                                              );
+                                                          })()}
+                                                      </div>
+                                                  </div>
 
-                                                {/* Quantity Control */}
-                                                <div className="flex items-center bg-black/40 border border-white/5 rounded-xl p-1 w-fit">
-                                                    <button 
-                                                        onClick={() => decrementCartItem(item)}
-                                                        className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all ${item.quantity <= 1 ? "opacity-10 cursor-not-allowed" : "text-white/40 hover:text-white hover:bg-white/5 active:scale-90"}`}
-                                                    >−</button>
-                                                    <span className="w-10 text-center text-sm font-black tabular-nums text-white">{item.quantity}</span>
-                                                    <button 
-                                                        onClick={() => incrementCartItem(item)}
-                                                        className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all ${item.quantity >= 10 ? "opacity-10 cursor-not-allowed" : "text-white/40 hover:text-white hover:bg-white/5 active:scale-90"}`}
-                                                    >+</button>
-                                                </div>
-                                            </div>
+                                                 {/* Quantity Control */}
+                                                 <div className="flex items-center bg-white/[0.03] border border-white/[0.05] rounded-2xl p-1 w-fit group/qty hover:border-amber-400/20 transition-all duration-500 shadow-inner">
+                                                     <button 
+                                                         onClick={() => decrementCartItem(item)}
+                                                         className={`w-11 h-11 flex items-center justify-center rounded-xl transition-all ${item.quantity <= 1 ? "opacity-10 cursor-not-allowed" : "text-white/40 hover:text-white hover:bg-white/10 active:scale-95"}`}
+                                                     >
+                                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M20 12H4"/></svg>
+                                                     </button>
+                                                     <span className="w-14 text-center text-base font-black tabular-nums text-white/90">{item.quantity}</span>
+                                                     <button 
+                                                         onClick={() => incrementCartItem(item)}
+                                                         className={`w-11 h-11 flex items-center justify-center rounded-xl transition-all ${item.quantity >= 10 ? "opacity-10 cursor-not-allowed" : "text-white/40 hover:text-white hover:bg-white/10 active:scale-95"}`}
+                                                     >
+                                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4"/></svg>
+                                                     </button>
+                                                 </div>
+                                             </div>
 
-                                            {/* Item Total */}
-                                            <div className="text-right">
-                                                <p className="text-[9px] text-white/20 uppercase tracking-[0.3em] font-black mb-1">Item Total</p>
-                                                <p className="text-3xl font-light tracking-tighter text-amber-400">
-                                                    {formatCurrency((item.price?.amount || 0) * item.quantity)}
-                                                </p>
-                                            </div>
-                                        </div>
+                                             {/* Item Total - Integrated Sidebar */}
+                                             <div className="flex flex-col items-end gap-3 bg-gradient-to-br from-white/[0.03] to-transparent p-8 rounded-[2.5rem] min-w-[200px] transition-all duration-700 shadow-[0_10px_40px_rgba(0,0,0,0.2)]">
+                                                 <p className="text-[10px] text-white/20 uppercase tracking-[0.5em] font-black">Bag Total</p>
+                                                 <div className="flex flex-col items-end gap-1">
+                                                     <p className="text-4xl font-extralight tracking-tighter text-amber-400/90">
+                                                         {(() => {
+                                                             const { currentPrice } = getCurrentPricing(item);
+                                                             return formatCurrency(currentPrice * item.quantity);
+                                                         })()}
+                                                     </p>
+                                                     {(() => {
+                                                         const { currentPrice, savedPrice, mrp } = getCurrentPricing(item);
+                                                         const effectiveOriginal = (currentPrice < savedPrice) ? savedPrice : mrp;
+                                                         
+                                                         if (effectiveOriginal && effectiveOriginal > currentPrice) {
+                                                             return (
+                                                                <span className="text-[9px] font-black text-emerald-400/60 uppercase tracking-[0.2em]">
+                                                                    Saving {formatCurrency((effectiveOriginal - currentPrice) * item.quantity)}
+                                                                </span>
+                                                             );
+                                                         }
+                                                         return null;
+                                                     })()}
+                                                 </div>
+                                             </div>
+                                         </div>
                                     </div>
                                  </div>
                             ))}
@@ -265,9 +325,9 @@ const Cart = () => {
                     </div>
 
                     {/* Summary Section */}
-                    <div className="lg:w-[380px] shrink-0 h-full overflow-hidden">
-                        <div className="h-full pt-2 pb-4">
-                            <div className="bg-[#050505] border border-white/[0.08] rounded-xl p-5 shadow-[0_30px_100px_rgba(0,0,0,0.8)] relative overflow-hidden flex flex-col group/summary hover:border-amber-400/20 transition-all duration-700 h-[74.5vh]">
+                    <div className="w-full lg:w-[350px] shrink-0 lg:sticky lg:top-32">
+                        <div className="pt-2 pb-4">
+                            <div className="bg-[#050505] border border-white/[0.08] rounded-xl p-5 shadow-[0_30px_100px_rgba(0,0,0,0.8)] relative overflow-hidden flex flex-col group/summary hover:border-amber-400/20 transition-all duration-700 min-h-[500px] lg:h-[70vh]">
                                 <div className="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 bg-amber-400/5 rounded-full blur-3xl group-hover/summary:bg-amber-400/10 transition-all duration-700" />
                                 <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-32 h-32 bg-orange-500/5 rounded-full blur-3xl group-hover/summary:bg-orange-500/10 transition-all duration-700" />
                                 
