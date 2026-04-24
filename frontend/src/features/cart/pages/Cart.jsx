@@ -3,11 +3,13 @@ import { useSelector } from 'react-redux'
 import { useCart } from '../hooks/useCart'
 import { Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { useRazorpay, RazorpayOrderOptions } from "react-razorpay";
 
 const Cart = () => {
     const { items: cart, totalPrice, currency } = useSelector(state => state.cart)
     const { handleGetCart, handleRemoveItem, handleUpdateItem } = useCart()
     const [loading, setLoading] = useState(true)
+    const { error, isLoading, Razorpay} = useRazorpay();
 
     useEffect(() => {
         const fetch = async () => {
@@ -138,19 +140,19 @@ const Cart = () => {
     }
 
     return (
-        <div className="min-h-screen bg-black text-white pt-32 pb-20 px-6 sm:px-10 lg:px-16">
-            <div className="max-w-6xl mx-auto">
-                <div className="flex flex-col lg:flex-row gap-12 lg:gap-24">
+        <div className="h-screen bg-black text-white pt-32 pb-10 px-6 sm:px-10 lg:px-16 overflow-hidden">
+            <div className="max-w-6xl mx-auto h-full flex flex-col">
+                <div className="flex flex-col lg:flex-row gap-12 lg:gap-24 items-start h-full overflow-hidden">
                     
-                    {/* Items Section */}
-                    <div className="flex-1">
+                    {/* Items Section - Independently Scrollable */}
+                    <div className="flex-1 h-full overflow-y-auto pr-4 custom-scrollbar">
                         <header className="mb-12">
                             <h1 className="text-4xl font-extralight tracking-[0.05em] uppercase mb-4">
                                 Shopping <span className="text-amber-400">Bag</span>
                             </h1>
-                            <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em] flex items-center gap-4">
+                            <div className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em] flex items-center gap-4">
                                 {cart.length} curated pieces <div className="h-[1px] flex-1 bg-white/10" />
-                            </p>
+                            </div>
                         </header>
 
                         <div className="space-y-16">
@@ -263,78 +265,102 @@ const Cart = () => {
                     </div>
 
                     {/* Summary Section */}
-                    <div className="lg:w-[400px] shrink-0">
-                        <div className="sticky top-32 space-y-8">
-                            <div className="bg-white/[0.02] border border-white/10 rounded-[2.5rem] p-10 backdrop-blur-3xl relative overflow-hidden">
-                                <div className="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 bg-amber-400/5 rounded-full blur-3xl" />
+                    <div className="lg:w-[380px] shrink-0 h-full overflow-hidden">
+                        <div className="h-full pt-2 pb-4">
+                            <div className="bg-[#050505] border border-white/[0.08] rounded-xl p-5 shadow-[0_30px_100px_rgba(0,0,0,0.8)] relative overflow-hidden flex flex-col group/summary hover:border-amber-400/20 transition-all duration-700 h-[74.5vh]">
+                                <div className="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 bg-amber-400/5 rounded-full blur-3xl group-hover/summary:bg-amber-400/10 transition-all duration-700" />
+                                <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-32 h-32 bg-orange-500/5 rounded-full blur-3xl group-hover/summary:bg-orange-500/10 transition-all duration-700" />
                                 
-                                <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mb-10 pb-4 border-b border-white/10">Order Summary</h2>
+                                <h2 className="text-[10px] font-black uppercase tracking-[0.8em] text-white/50 mb-8 pb-4 border-b border-white/[0.08] flex justify-between items-center">
+                                    <span>Order Summary</span>
+                                    <div className="flex items-center gap-1.5 bg-amber-400/10 px-2 py-1 rounded-full border border-amber-400/20">
+                                        <span className="text-[7px] text-amber-400/80 tracking-widest font-black uppercase">Active</span>
+                                        <div className="w-1 h-1 rounded-full bg-amber-400 animate-pulse" />
+                                    </div>
+                                </h2>
                                 
-                                <div className="space-y-6 mb-12">
-                                    <div className="flex justify-between items-center text-sm">
-                                        <span className="text-white/40 font-light uppercase tracking-widest">Subtotal</span>
-                                        <span className="font-light">{formatCurrency(subtotal)}</span>
+                                <div className="space-y-6 mb-10">
+                                    <div className="flex justify-between items-center group/item px-2">
+                                        <div className="flex flex-col gap-1">
+                                            <span className="text-white/60 text-[10px] font-black uppercase tracking-[0.3em]">Subtotal</span>
+                                            <span className="text-[8px] text-white/30 uppercase tracking-[0.2em] font-medium">Items Total</span>
+                                        </div>
+                                        <span className="text-[14px] font-light tracking-[0.15em] text-white/90">{formatCurrency(subtotal)}</span>
                                     </div>
-                                    <div className="flex justify-between items-center text-sm">
-                                        <span className="text-white/40 font-light uppercase tracking-widest">Shipping</span>
-                                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">Complimentary</span>
+                                    
+                                    <div className="flex justify-between items-center group/item px-2">
+                                        <div className="flex flex-col gap-1">
+                                            <span className="text-white/60 text-[10px] font-black uppercase tracking-[0.3em]">Shipping</span>
+                                            <span className="text-[8px] text-emerald-400/60 uppercase tracking-[0.2em] font-black">Standard Delivery</span>
+                                        </div>
+                                        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-emerald-400 border-b border-emerald-400/30 pb-0.5">Complimentary</span>
                                     </div>
-                                    <div className="pt-8 border-t border-white/10 flex justify-between items-end">
-                                        <div>
-                                            <span className="text-[9px] uppercase tracking-[0.3em] font-black text-amber-400 block mb-2">Est. Total</span>
-                                            <span className="text-4xl font-light tracking-tighter text-white">
+
+                                    <div className="pt-8 border-t border-white/[0.08] flex flex-col items-center">
+                                        <div className="mb-4 flex flex-col items-center">
+                                            <div className="h-[1px] w-8 bg-amber-400/30 mb-3" />
+                                            <span className="text-[9px] uppercase tracking-[0.5em] font-black text-amber-400/80">Total Amount</span>
+                                        </div>
+                                        <div className="relative group/price py-2">
+                                            <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-24 w-full bg-amber-400/[0.05] blur-[60px] rounded-full opacity-100 group-hover:bg-amber-400/[0.08] transition-all duration-1000" />
+                                            <span className="text-5xl font-extralight tracking-[-0.07em] text-white relative z-10 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]">
                                                 {formatCurrency(subtotal)}
                                             </span>
                                         </div>
                                     </div>
                                 </div>
-
-                                <div className="space-y-4">
-                                    <button className="w-full bg-gradient-to-r from-amber-400 to-orange-500 text-black py-5 text-[10px] font-bold uppercase tracking-[0.3em] rounded-sm shadow-lg hover:brightness-105 hover:-translate-y-0.5 transition-all active:scale-[0.98]">
-                                        Proceed to Checkout
+                                
+                                <div className="space-y-4 px-2">
+                                    <button /* onClick={handlePayment} */
+                                    className="group/btn relative w-full bg-gradient-to-r from-amber-400 to-orange-500 text-black py-4.5 text-[10px] font-bold uppercase tracking-[0.5em] rounded-sm overflow-hidden shadow-[0_15px_50px_rgba(251,191,36,0.2)] transition-all duration-700 hover:shadow-[0_25px_80px_rgba(251,191,36,0.35)] hover:-translate-y-1.5">
+                                        <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/50 to-transparent -skew-x-[45deg] -translate-x-[250%] group-hover/btn:translate-x-[250%] transition-transform duration-[1200ms] ease-in-out" />
+                                        <span className="relative z-10 flex items-center justify-center gap-2">
+                                            Proceed to Checkout
+                                            <svg className="w-3 h-3 group-hover/btn:translate-x-1 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                                        </span>
                                     </button>
                                     
                                     <Link 
                                         to="/" 
-                                        className="block w-full text-center border border-white/10 bg-white/5 text-white py-5 text-[10px] font-bold uppercase tracking-[0.3em] rounded-sm hover:bg-white/10 transition-all active:scale-[0.98]"
+                                        className="block w-full text-center border border-white/[0.12] bg-white/[0.02] text-white/50 py-4 text-[9px] font-black uppercase tracking-[0.5em] rounded-sm hover:bg-white/[0.06] hover:text-white hover:border-white/30 transition-all duration-700"
                                     >
                                         Continue Shopping
                                     </Link>
                                 </div>
-
-                                <div className="mt-8 pt-6 border-t border-white/5">
-                                    <div className="w-full bg-amber-400/[0.02] border border-amber-400/10 rounded-2xl p-5">
-                                        <div className="flex items-center gap-4 mb-4">
-                                            <div className="w-10 h-10 rounded-xl bg-amber-400/10 flex items-center justify-center text-amber-400">
-                                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                                </svg>
+                                
+                                <div className="mt-auto pt-8">
+                                    <div className="flex flex-col gap-6">
+                                        <div className="flex items-center justify-between px-5 py-3.5 bg-white/[0.03] border border-white/[0.08] rounded-2xl group/security hover:border-emerald-400/30 transition-all duration-700">
+                                            <div className="flex items-center gap-4">
+                                                <div className="relative">
+                                                    <div className="absolute inset-0 bg-emerald-400/30 rounded-full blur-md animate-pulse" />
+                                                    <svg className="w-4 h-4 text-emerald-400 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                                    </svg>
+                                                </div>
+                                                <div className="flex flex-col gap-0.5">
+                                                    <span className="text-[8px] font-black uppercase tracking-[0.3em] text-white/60 group-hover/security:text-emerald-400 transition-colors duration-700">Secure Checkout</span>
+                                                    <span className="text-[6px] uppercase tracking-[0.2em] text-white/30 font-bold">Encrypted Session</span>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <p className="text-[9px] font-black uppercase tracking-widest text-amber-400">Guaranteed Safe Checkout</p>
-                                                <p className="text-[7px] text-white/30 uppercase tracking-[0.2em]">PCI-DSS Certified • 256-Bit SSL</p>
+                                            <div className="flex gap-1.5 opacity-30 group-hover/security:opacity-50 transition-opacity">
+                                                <div className="w-1 h-1 rounded-full bg-white" />
+                                                <div className="w-1 h-1 rounded-full bg-white" />
                                             </div>
                                         </div>
-                                        <div className="flex justify-between items-center opacity-20 text-[6px] font-black tracking-[0.3em] uppercase">
-                                            <span>Visa</span>
-                                            <div className="w-1 h-1 rounded-full bg-white/20" />
-                                            <span>Mastercard</span>
-                                            <div className="w-1 h-1 rounded-full bg-white/20" />
-                                            <span>PayPal</span>
-                                            <div className="w-1 h-1 rounded-full bg-white/20" />
-                                            <span>Amex</span>
+                                        
+                                        <div className="flex items-center justify-center gap-5 opacity-30 group/razor hover:opacity-50 transition-all duration-700">
+                                            <span className="text-[7px] font-black uppercase tracking-[0.5em] text-white/80">Powered by</span>
+                                            <div className="flex items-center gap-2.5 grayscale group-hover/razor:grayscale-0 transition-all">
+                                                <span className="text-[10px] font-black uppercase tracking-[0.1em] text-white">Razorpay</span>
+                                                <div className="w-1 h-1 rounded-full bg-[#3395FF] animate-pulse shadow-[0_0_10px_rgba(51,149,255,0.6)]" />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
-                            <div className="px-8 py-5 bg-amber-400/[0.03] border border-amber-400/10 rounded-3xl flex items-center justify-between">
-                                <span className="text-[9px] uppercase tracking-[0.3em] text-amber-400/60 font-black">Premium Support 24/7</span>
-                                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.4)]" />
-                            </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
