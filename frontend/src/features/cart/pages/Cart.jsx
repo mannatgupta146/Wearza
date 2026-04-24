@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
 const Cart = () => {
-    const cartItems = useSelector(state => state.cart.items)
+    const { items: cart, totalPrice, currency } = useSelector(state => state.cart)
     const { handleGetCart, handleRemoveItem, handleUpdateItem } = useCart()
     const [loading, setLoading] = useState(true)
 
@@ -17,29 +17,36 @@ const Cart = () => {
         fetch()
     }, [])
 
-    const subtotal = useMemo(() => {
-        if (!cartItems) return 0
-        return cartItems.reduce((acc, item) => ((item.price?.amount || 0) * item.quantity) + acc, 0)
-    }, [cartItems])
+    const subtotal = totalPrice || 0
 
     const formatCurrency = (amount) => {
         return new Intl.NumberFormat('en-IN', {
             style: 'currency',
-            currency: 'INR',
+            currency: currency || 'INR',
             maximumFractionDigits: 0
         }).format(amount)
     }
 
     const getVariantLabel = (item) => {
         if (!item.variant || !item.product?.variants) return []
-        const v = item.product.variants.find(v => v._id === item.variant)
+        
+        // Handle both aggregated (single object) and raw (array) variants
+        const variants = item.product.variants
+        const v = Array.isArray(variants) 
+            ? variants.find(v => v._id === item.variant)
+            : (variants._id === item.variant ? variants : null)
+            
         return v?.attributes ? Object.entries(v.attributes) : []
     }
 
     const getPriceAnalysis = (item) => {
         if (!item.product || !item.variant || !item.price) return null
         
-        const currentVariant = item.product.variants?.find(v => v._id === item.variant)
+        const variants = item.product.variants
+        const currentVariant = Array.isArray(variants)
+            ? variants.find(v => v._id === item.variant)
+            : (variants._id === item.variant ? variants : null)
+            
         const currentPrice = currentVariant?.price?.amount || item.product.price?.amount
         const savedPrice = item.price.amount
 
@@ -63,7 +70,11 @@ const Cart = () => {
 
     const getItemImage = (item) => {
         if (item.variant && item.product?.variants) {
-            const variant = item.product.variants.find(v => v._id === item.variant)
+            const variants = item.product.variants
+            const variant = Array.isArray(variants)
+                ? variants.find(v => v._id === item.variant)
+                : (variants._id === item.variant ? variants : null)
+                
             if (variant?.images?.length > 0) return variant.images[0].url
         }
         return item.product?.images?.[0]?.url
@@ -106,7 +117,7 @@ const Cart = () => {
         </div>
     }
 
-    if (!cartItems || cartItems.length === 0) {
+    if (!cart || cart.length === 0) {
         return (
             <div className="min-h-screen bg-black pt-32 px-6 flex flex-col items-center justify-center text-center">
                 <div className="w-24 h-24 rounded-full bg-amber-400/5 border border-amber-400/10 flex items-center justify-center mb-8">
@@ -138,12 +149,12 @@ const Cart = () => {
                                 Shopping <span className="text-amber-400">Bag</span>
                             </h1>
                             <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em] flex items-center gap-4">
-                                {cartItems.length} curated pieces <div className="h-[1px] flex-1 bg-white/10" />
+                                {cart.length} curated pieces <div className="h-[1px] flex-1 bg-white/10" />
                             </p>
                         </header>
 
                         <div className="space-y-16">
-                            {cartItems.map((item) => (
+                            {cart.map((item) => (
                                  <div key={item._id} className="group relative flex flex-col lg:flex-row gap-12 pb-16 border-b border-white/[0.05] transition-all duration-700">
                                     {/* Image Section */}
                                     <div className="h-80 w-full lg:w-64 shrink-0 bg-[#09090a] rounded-[2.5rem] overflow-hidden relative border border-white/[0.05] group-hover:border-amber-400/20 transition-all duration-700 group-hover:shadow-[0_20px_50px_rgba(0,0,0,0.4)]">

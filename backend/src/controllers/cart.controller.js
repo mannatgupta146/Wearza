@@ -1,6 +1,7 @@
 import cartModel from "../models/cart.model.js"
 import productModel from "../models/product.model.js"
 import { stockOfVariant } from "../dao/product.dao.js"
+import mongoose from "mongoose"
 
 export const addToCartController = async (req, res) => {
     try {
@@ -114,17 +115,89 @@ export const addToCartController = async (req, res) => {
 export const getCartController = async (req, res) => {
     const user = req.user
 
-    let cart = await cartModel.findOne({ user: user._id }).populate("items.product")
+    try {
+        let cart = await cartModel.findOne({ user: user._id })
+        if (!cart) {
+            cart = await cartModel.create({ user: user._id, items: [] })
+        }
 
-    if (!cart) {
-        cart = await cartModel.create({ user: user._id })
+        if (cart.items.length === 0) {
+            return res.status(200).json({
+                success: true,
+                message: "Cart fetched successfully",
+                cart: {
+                    ...cart.toObject(),
+                    totalPrice: 0,
+                    currency: null
+                }
+            })
+        }
+
+        const aggregatedCart = await cartModel.aggregate([
+            {
+                $match: {
+                    user: new mongoose.Types.ObjectId(user._id)
+                }
+            },
+            { $unwind: { path: '$items' } },
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: 'items.product',
+                    foreignField: '_id',
+                    as: 'items.product'
+                }
+            },
+            { $unwind: { path: '$items.product' } },
+            {
+                $unwind: { path: '$items.product.variants' }
+            },
+            {
+                $match: {
+                    $expr: {
+                        $eq: [
+                            '$items.variant',
+                            '$items.product.variants._id'
+                        ]
+                    }
+                }
+            },
+            {
+                $addFields: {
+                    itemPrice: {
+                        price: {
+                            $multiply: [
+                                '$items.quantity',
+                                '$items.product.variants.price.amount'
+                            ]
+                        },
+                        currency: '$items.product.variants.price.currency'
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: '$_id',
+                    totalPrice: { $sum: '$itemPrice.price' },
+                    currency: { $first: '$itemPrice.currency' },
+                    items: { $push: '$items' }
+                }
+            }
+        ])
+
+        const finalCart = aggregatedCart[0] || { ...cart.toObject(), totalPrice: 0 }
+
+        return res.status(200).json({ 
+            success: true,
+            message: "Cart fetched successfully",
+            cart: finalCart 
+        })
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message || "Failed to fetch cart"
+        })
     }
-
-    return res.status(200).json({ 
-        success: true,
-        message: "Cart fetched successfully",
-        cart 
-    })
 }
 
 export const removeFromCartController = async (req, res) => {

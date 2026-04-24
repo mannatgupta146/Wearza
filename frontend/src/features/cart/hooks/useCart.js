@@ -13,7 +13,9 @@ export const useCart = () => {
 
     const handleGetCart = async () => {
         const response = await getCartItemsApi()
-        dispatch(setCart(response.cart.items))
+        if (response.success && response.cart) {
+            dispatch(setCart(response.cart))
+        }
     }
 
     const handleAddItem = async ({ productId, variantId, quantity, title, image }) => {

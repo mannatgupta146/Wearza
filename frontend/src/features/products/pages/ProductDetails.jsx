@@ -218,25 +218,35 @@ const ProductDetails = () => {
         newAttrs[key] = value
       }
 
+      // Find matching variant based on ALL currently selected attributes
       const matchingVariant = product.variants.find((variant) => {
         return Object.entries(newAttrs).every(
           ([attrKey, attrValue]) => variant.attributes[attrKey] === attrValue,
         )
       })
 
+      // Update variant state if all attributes for a variant are selected
       if (Object.keys(newAttrs).length > 0 && matchingVariant) {
         setSelectedVariant(matchingVariant)
-        setSelectedImageIndex(0)
-        setSearchParams({ variant: matchingVariant._id }, { replace: true })
       } else {
         setSelectedVariant(null)
-        setSelectedImageIndex(0)
-        setSearchParams({}, { replace: true })
       }
 
+      setSelectedImageIndex(0)
       return newAttrs
     })
   }
+
+  // Synchronize URL with selected variant to prevent "update during render" warning
+  useEffect(() => {
+    if (selectedVariant) {
+      if (searchParams.get("variant") !== selectedVariant._id) {
+        setSearchParams({ variant: selectedVariant._id }, { replace: true })
+      }
+    } else if (searchParams.has("variant")) {
+      setSearchParams({}, { replace: true })
+    }
+  }, [selectedVariant, setSearchParams])
 
   const hasMultipleImages =
     (selectedVariant?.images?.length || productImages.length) > 1
