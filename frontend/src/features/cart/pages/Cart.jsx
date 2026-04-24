@@ -160,12 +160,12 @@ const Cart = () => {
     }
 
     return (
-        <div className="min-h-screen bg-black text-white pt-32 pb-10 px-6 sm:px-10 lg:px-16 overflow-x-hidden">
-            <div className="max-w-6xl mx-auto flex flex-col h-full">
-                <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start">
+        <div className="h-screen bg-black text-white pt-32 pb-10 px-6 sm:px-10 lg:px-16 overflow-hidden">
+            <div className="max-w-7xl mx-auto flex flex-col h-full">
+                <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start h-full overflow-hidden">
                     
                     {/* Items Section - Independently Scrollable */}
-                    <div className="flex-1 w-full min-w-0">
+                    <div className="flex-1 w-full min-w-0 h-full overflow-y-auto pr-6 custom-scrollbar">
                         <header className="mb-12">
                             <h1 className="text-4xl font-extralight tracking-[0.05em] uppercase mb-4">
                                 Shopping <span className="text-amber-400">Bag</span>
@@ -325,9 +325,9 @@ const Cart = () => {
                     </div>
 
                     {/* Summary Section */}
-                    <div className="w-full lg:w-[350px] shrink-0 lg:sticky lg:top-32">
-                        <div className="pt-2 pb-4">
-                            <div className="bg-[#050505] border border-white/[0.08] rounded-xl p-5 shadow-[0_30px_100px_rgba(0,0,0,0.8)] relative overflow-hidden flex flex-col group/summary hover:border-amber-400/20 transition-all duration-700 min-h-[500px] lg:h-[70vh]">
+                    <div className="w-full lg:w-[350px] shrink-0 h-full">
+                        <div className="h-full">
+                            <div className="bg-[#050505] border border-white/[0.08] rounded-xl p-5 shadow-[0_30px_100px_rgba(0,0,0,0.8)] relative overflow-hidden flex flex-col group/summary hover:border-amber-400/20 transition-all duration-700 h-full">
                                 <div className="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 bg-amber-400/5 rounded-full blur-3xl group-hover/summary:bg-amber-400/10 transition-all duration-700" />
                                 <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-32 h-32 bg-orange-500/5 rounded-full blur-3xl group-hover/summary:bg-orange-500/10 transition-all duration-700" />
                                 
