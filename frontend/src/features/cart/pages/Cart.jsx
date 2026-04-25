@@ -7,7 +7,7 @@ import { useRazorpay, RazorpayOrderOptions } from "react-razorpay";
 
 const Cart = () => {
     const { items: cart, totalPrice, currency } = useSelector(state => state.cart)
-    const { handleGetCart, handleRemoveItem, handleUpdateItem } = useCart()
+    const { handleGetCart, handleRemoveItem, handleUpdateItem, handleCreateCartOrder } = useCart()
     const [loading, setLoading] = useState(true)
     const { error, isLoading, Razorpay} = useRazorpay();
 
@@ -18,6 +18,11 @@ const Cart = () => {
         }
         fetch()
     }, [])
+
+    const handleCheckout = async () => {
+        const order = await handleCreateCartOrder()
+        console.log(order)
+    }
 
     const getCurrentPricing = (item) => {
         const variants = item.product?.variants;
@@ -33,13 +38,6 @@ const Cart = () => {
         return { currentPrice, savedPrice, mrp, isPriceDropped };
     };
 
-    const subtotal = useMemo(() => {
-        if (!cart) return 0;
-        return cart.reduce((total, item) => {
-            const { currentPrice } = getCurrentPricing(item);
-            return total + (currentPrice * item.quantity);
-        }, 0);
-    }, [cart]);
 
     const formatCurrency = (amount) => {
         return new Intl.NumberFormat('en-IN', {
@@ -224,54 +222,53 @@ const Cart = () => {
                                              <div className="space-y-8">
                                                   {/* Price Display */}
                                                   <div className="space-y-4">
-                                                      <div className="flex flex-col gap-1.5">
-                                                          {(() => {
-                                                              const { currentPrice, savedPrice, mrp } = getCurrentPricing(item);
-                                                              const isPriceDropped = currentPrice < savedPrice;
-                                                              const isPriceIncreased = currentPrice > savedPrice;
+                                                       <div className="flex flex-col gap-1.5">
+                                                           {(() => {
+                                                               const { currentPrice, savedPrice, mrp } = getCurrentPricing(item);
+                                                               const analysis = getPriceAnalysis(item);
 
-                                                              return (
-                                                                  <>
-                                                                      <div className="flex items-baseline gap-3">
-                                                                          <span className="text-5xl font-extralight tracking-tighter text-white transition-all duration-700">
-                                                                              {formatCurrency(currentPrice)}
-                                                                          </span>
-                                                                          {isPriceDropped && (
-                                                                              <span className="text-base text-white/30 line-through font-normal decoration-white/60">
-                                                                                  {formatCurrency(savedPrice)}
-                                                                              </span>
-                                                                          )}
-                                                                          {isPriceIncreased && (
-                                                                              <span className="text-xs text-white/20 font-light">
-                                                                                  from {formatCurrency(savedPrice)}
-                                                                              </span>
-                                                                          )}
-                                                                      </div>
-                                                                      {isPriceDropped && (
-                                                                          <div className="flex items-center gap-2 bg-emerald-400/5 px-3 py-1 rounded-full w-fit animate-pulse">
-                                                                              <div className="w-1 h-1 rounded-full bg-emerald-400" />
-                                                                              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-400">
-                                                                                  Price Dropped
-                                                                              </span>
-                                                                          </div>
-                                                                      )}
-                                                                      {isPriceIncreased && (
-                                                                          <div className="flex items-center gap-2 bg-rose-500/10 px-3 py-1 rounded-full w-fit animate-pulse border border-rose-500/20">
-                                                                              <div className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-                                                                              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-rose-500">
-                                                                                  Price Rising
-                                                                              </span>
-                                                                          </div>
-                                                                      )}
-                                                                      {!isPriceDropped && !isPriceIncreased && mrp && mrp > currentPrice && (
-                                                                          <span className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-400/60">
-                                                                              {Math.round(((mrp - currentPrice) / mrp) * 100)}% Special Offer
-                                                                          </span>
-                                                                      )}
-                                                                  </>
-                                                              );
-                                                          })()}
-                                                      </div>
+                                                               return (
+                                                                   <>
+                                                                       <div className="flex items-baseline gap-3">
+                                                                           <span className="text-5xl font-extralight tracking-tighter text-white transition-all duration-700">
+                                                                               {formatCurrency(currentPrice)}
+                                                                           </span>
+                                                                           {analysis?.type === 'drop' && (
+                                                                               <span className="text-base text-white/30 line-through font-normal decoration-white/60">
+                                                                                   {formatCurrency(savedPrice)}
+                                                                               </span>
+                                                                           )}
+                                                                           {analysis?.type === 'increase' && (
+                                                                               <span className="text-xs text-white/20 font-light">
+                                                                                   from {formatCurrency(savedPrice)}
+                                                                               </span>
+                                                                           )}
+                                                                       </div>
+                                                                       {analysis && (
+                                                                           <div className={`flex items-center gap-2 px-3 py-1 rounded-full w-fit animate-pulse border transition-all duration-700 ${
+                                                                               analysis.type === 'drop' 
+                                                                                   ? 'bg-emerald-400/5 border-emerald-400/20' 
+                                                                                   : 'bg-rose-500/10 border-rose-500/20'
+                                                                           }`}>
+                                                                               <div className={`w-1.5 h-1.5 rounded-full ${
+                                                                                   analysis.type === 'drop' ? 'bg-emerald-400' : 'bg-rose-500'
+                                                                               }`} />
+                                                                               <span className={`text-[9px] font-black uppercase tracking-[0.2em] ${
+                                                                                   analysis.type === 'drop' ? 'text-emerald-400' : 'text-rose-500'
+                                                                               }`}>
+                                                                                   {analysis.message}
+                                                                               </span>
+                                                                           </div>
+                                                                       )}
+                                                                       {!analysis && mrp && mrp > currentPrice && (
+                                                                           <span className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-400/60">
+                                                                               {Math.round(((mrp - currentPrice) / mrp) * 100)}% Special Offer
+                                                                           </span>
+                                                                       )}
+                                                                   </>
+                                                               );
+                                                           })()}
+                                                       </div>
                                                   </div>
 
                                                  {/* Quantity Control */}
@@ -345,7 +342,7 @@ const Cart = () => {
                                             <span className="text-white/60 text-[10px] font-black uppercase tracking-[0.3em]">Subtotal</span>
                                             <span className="text-[8px] text-white/30 uppercase tracking-[0.2em] font-medium">Items Total</span>
                                         </div>
-                                        <span className="text-[14px] font-light tracking-[0.15em] text-white/90">{formatCurrency(subtotal)}</span>
+                                        <span className="text-[14px] font-light tracking-[0.15em] text-white/90">{formatCurrency(totalPrice)}</span>
                                     </div>
                                     
                                     <div className="flex justify-between items-center group/item px-2">
@@ -364,14 +361,14 @@ const Cart = () => {
                                         <div className="relative group/price py-2">
                                             <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-24 w-full bg-amber-400/[0.05] blur-[60px] rounded-full opacity-100 group-hover:bg-amber-400/[0.08] transition-all duration-1000" />
                                             <span className="text-5xl font-extralight tracking-[-0.07em] text-white relative z-10 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]">
-                                                {formatCurrency(subtotal)}
+                                                {formatCurrency(totalPrice)}
                                             </span>
                                         </div>
                                     </div>
                                 </div>
                                 
                                 <div className="space-y-4 px-2">
-                                    <button /* onClick={handlePayment} */
+                                    <button onClick={handleCheckout}
                                     className="group/btn relative w-full bg-gradient-to-r from-amber-400 to-orange-500 text-black py-4.5 text-[10px] font-bold uppercase tracking-[0.5em] rounded-sm overflow-hidden shadow-[0_15px_50px_rgba(251,191,36,0.2)] transition-all duration-700 hover:shadow-[0_25px_80px_rgba(251,191,36,0.35)] hover:-translate-y-1.5">
                                         <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/50 to-transparent -skew-x-[45deg] -translate-x-[250%] group-hover/btn:translate-x-[250%] transition-transform duration-[1200ms] ease-in-out" />
                                         <span className="relative z-10 flex items-center justify-center gap-2">

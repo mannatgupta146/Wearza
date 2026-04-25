@@ -24,3 +24,8 @@ export const updateItemInCartApi = async ({ productId, variantId, quantity }) =>
     const response = await cartApi.put(`/update/${productId}/${variantId}`, { quantity })
     return response.data
 }
+
+export const createCartOrderApi = async () => {
+    const response = await cartApi.post("/payment/create/order")
+    return response.data
+}

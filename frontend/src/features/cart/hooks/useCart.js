@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux"
 import {addItem, removeItem, updateItem, setCart} from "../state/cart.slice.js"
-import { getCartItemsApi, addToCartApi, removeFromCartApi, updateItemInCartApi } from "../services/cart.api.js"
+import { getCartItemsApi, addToCartApi, removeFromCartApi, updateItemInCartApi, createCartOrderApi } from "../services/cart.api.js"
 import { toast } from "react-toastify"
 import { useNavigate } from "react-router-dom"
 import CartNotification from "../components/CartNotification.jsx"
@@ -95,11 +95,28 @@ export const useCart = () => {
         }
     }
 
+    const handleCreateCartOrder = async () => {
+        try {
+            const data = await createCartOrderApi()
+            return data.order
+
+        } catch (error) {
+            const message = error.response?.data?.message || "Failed to create order"
+            toast.error(message, {
+                position: "bottom-right",
+                autoClose: 2000,
+                hideProgressBar: true,
+                theme: "dark",
+            })
+        }
+    }
+
     return {
         cart,
         handleGetCart,
         handleAddItem,
         handleRemoveItem,
-        handleUpdateItem
+        handleUpdateItem,
+        handleCreateCartOrder
     }
-}
+}
