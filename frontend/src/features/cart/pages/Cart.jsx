@@ -3,12 +3,13 @@ import { useSelector } from 'react-redux'
 import { useCart } from '../hooks/useCart'
 import { Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { useRazorpay, RazorpayOrderOptions } from "react-razorpay";
+import { useRazorpay } from "react-razorpay";
 
 const Cart = () => {
     const { items: cart, totalPrice, currency } = useSelector(state => state.cart)
     const { handleGetCart, handleRemoveItem, handleUpdateItem, handleCreateCartOrder } = useCart()
     const [loading, setLoading] = useState(true)
+    const user = useSelector(state => state.user)
     const { error, isLoading, Razorpay} = useRazorpay();
 
     useEffect(() => {
@@ -22,6 +23,30 @@ const Cart = () => {
     const handleCheckout = async () => {
         const order = await handleCreateCartOrder()
         console.log(order)
+
+        const options= {
+            key: "rzp_test_ShkLOA2ShVf1Fi",
+            amount: order.amount, // Amount in paise
+            currency: order.currency,
+            name: "Wearza",
+            description: "Payment for your order",
+            order_id: order.id, 
+            handler: (response) => {
+                console.log(response);
+                navigate("/")
+            },
+            prefill: {
+                name: user?.fullname,
+                email: user?.email,
+                contact: "9999999999",
+            },
+            theme: {
+                color: "#FF9E00",
+            },
+        };
+
+    const razorpayInstance = new Razorpay(options);
+    razorpayInstance.open();
     }
 
     const getCurrentPricing = (item) => {
