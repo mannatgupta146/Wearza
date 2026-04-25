@@ -1,8 +1,8 @@
 import cartModel from "../models/cart.model.js"
 import productModel from "../models/product.model.js"
 import { stockOfVariant } from "../dao/product.dao.js"
-import mongoose from "mongoose"
 import { createOrder } from "../services/payment.service.js"
+import { getCartDetails } from "../dao/cart.dao.js"
 
 export const addToCartController = async (req, res) => {
     try {
@@ -117,7 +117,8 @@ export const getCartController = async (req, res) => {
     const user = req.user
 
     try {
-        let cart = await cartModel.findOne({ user: user._id })
+        let cart = await getCartDetails(user._id)
+
         if (!cart) {
             cart = await cartModel.create({ user: user._id, items: [] })
         }
@@ -134,59 +135,7 @@ export const getCartController = async (req, res) => {
             })
         }
 
-        const aggregatedCart = await cartModel.aggregate([
-            {
-                $match: {
-                    user: new mongoose.Types.ObjectId(user._id)
-                }
-            },
-            { $unwind: { path: '$items' } },
-            {
-                $lookup: {
-                    from: 'products',
-                    localField: 'items.product',
-                    foreignField: '_id',
-                    as: 'items.product'
-                }
-            },
-            { $unwind: { path: '$items.product' } },
-            {
-                $unwind: { path: '$items.product.variants' }
-            },
-            {
-                $match: {
-                    $expr: {
-                        $eq: [
-                            '$items.variant',
-                            '$items.product.variants._id'
-                        ]
-                    }
-                }
-            },
-            {
-                $addFields: {
-                    itemPrice: {
-                        price: {
-                            $multiply: [
-                                '$items.quantity',
-                                '$items.product.variants.price.amount'
-                            ]
-                        },
-                        currency: '$items.product.variants.price.currency'
-                    }
-                }
-            },
-            {
-                $group: {
-                    _id: '$_id',
-                    totalPrice: { $sum: '$itemPrice.price' },
-                    currency: { $first: '$itemPrice.currency' },
-                    items: { $push: '$items' }
-                }
-            }
-        ])
-
-        const finalCart = aggregatedCart[0] || { ...cart.toObject(), totalPrice: 0 }
+        const finalCart = await getCartDetails(user._id) || { ...cart.toObject(), totalPrice: 0 }
 
         return res.status(200).json({ 
             success: true,
@@ -251,7 +200,20 @@ export const updateCartController = async (req, res) => {
 
 export const createOrderController = async (req, res) => {
     try {
-        const order = await createOrder({amount: 1000, currency: "INR"})
+
+        const cart = await getCartDetails(req.user.id)
+
+        if(!cart) return res.status(404).json({ 
+            success: false, 
+            message: "Cart not found" 
+        })
+
+        if(cart.items.length === 0) return res.status(400).json({
+            success: false, 
+            message: "Cart is empty" 
+        })
+
+        const order = await createOrder({amount: cart.totalPrice, currency: cart.currency})
 
         return res.status(200).json({
             success: true,
