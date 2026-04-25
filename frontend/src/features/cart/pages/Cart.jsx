@@ -22,6 +22,7 @@ const Cart = () => {
 
     const handleCheckout = async () => {
         const order = await handleCreateCartOrder()
+        if (!order) return;
         console.log(order)
 
         const options= {

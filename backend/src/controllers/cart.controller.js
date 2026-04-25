@@ -3,6 +3,7 @@ import productModel from "../models/product.model.js"
 import { stockOfVariant } from "../dao/product.dao.js"
 import { createOrder } from "../services/payment.service.js"
 import { getCartDetails } from "../dao/cart.dao.js"
+import paymentModel from "../models/payment.model.js"
 
 export const addToCartController = async (req, res) => {
     try {
@@ -201,7 +202,7 @@ export const updateCartController = async (req, res) => {
 export const createOrderController = async (req, res) => {
     try {
 
-        const cart = await getCartDetails(req.user.id)
+        const cart = await getCartDetails(req.user._id)
 
         if(!cart) return res.status(404).json({ 
             success: false, 
@@ -214,6 +215,29 @@ export const createOrderController = async (req, res) => {
         })
 
         const order = await createOrder({amount: cart.totalPrice, currency: cart.currency})
+
+        const payment = await paymentModel.create({
+            user: req.user._id,
+            razorpay: {
+                orderId: order.id,
+            },
+            price: {
+                amount: cart.totalPrice,
+                currency: cart.currency,
+            },
+            orderItems: cart.items.map(item => ({
+                title: item.product.title,
+                description: item.product.description,
+                productId: item.product._id,
+                variantId: item.variant,
+                images: item.product.variants.images || item.product.images,
+                quantity: item.quantity,
+                price: {
+                    amount: item.product.variants.price.amount || item.product.price.amount,
+                    currency: item.product.variants.price.currency || item.product.price.currency
+                }
+            }))
+        })
 
         return res.status(200).json({
             success: true,
