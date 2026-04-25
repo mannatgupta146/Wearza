@@ -2,6 +2,7 @@ import cartModel from "../models/cart.model.js"
 import productModel from "../models/product.model.js"
 import { stockOfVariant } from "../dao/product.dao.js"
 import mongoose from "mongoose"
+import { createOrder } from "../services/payment.service.js"
 
 export const addToCartController = async (req, res) => {
     try {
@@ -245,5 +246,23 @@ export const updateCartController = async (req, res) => {
         return res.status(200).json({ success: true, message: "Cart updated successfully" })
     } catch (error) {
         return res.status(500).json({ success: false, message: "Internal server error" })
+    }
+}
+
+export const createOrderController = async (req, res) => {
+    try {
+        const order = await createOrder({amount: 1000, currency: "INR"})
+
+        return res.status(200).json({
+            success: true,
+            message: "Order created successfully",
+            order
+        })
+        
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message || "Failed to create order"
+        })
     }
 }

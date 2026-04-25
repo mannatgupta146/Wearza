@@ -1,7 +1,7 @@
 import { Router } from "express"
 import { authenticateUser } from "../middleware/auth.middleware.js"
 import { validateAddToCart, validateUpdateCart } from "../validators/cart.validator.js"
-import { addToCartController, getCartController, removeFromCartController, updateCartController } from "../controllers/cart.controller.js"
+import { addToCartController, createOrderController, getCartController, removeFromCartController, updateCartController } from "../controllers/cart.controller.js"
 
 const cartRouter = Router()
 
@@ -33,6 +33,15 @@ cartRouter.delete('/remove/:productId/:variantId', authenticateUser, removeFromC
  * @desc Update item quantity in cart
  * @access Private
  */
+
 cartRouter.put('/update/:productId/:variantId', authenticateUser, validateUpdateCart, updateCartController)
+
+/**
+ * @route POST /cart/payment/create/order
+ * @desc Create order for payment
+ * @access Private
+ */
+
+cartRouter.post('/payment/create/order', authenticateUser, createOrderController)
 
 export default cartRouter

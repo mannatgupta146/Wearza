@@ -27,6 +27,16 @@ if(!process.env.IMAGEKIT_PRIVATE_KEY) {
     process.exit(1);
 }
 
+if(!process.env.RAZORPAY_KEY_ID) {
+    console.error('Error: RAZORPAY_KEY_ID is not defined in the environment variables.');
+    process.exit(1);
+}   
+
+if(!process.env.RAZORPAY_KEY_SECRET) {
+    console.error('Error: RAZORPAY_KEY_SECRET is not defined in the environment variables.');
+    process.exit(1);
+}   
+
 export const config = {
     MONGODB_URI: process.env.MONGODB_URI || 'mongodb://localhost:27017/snitch',
     JWT_SECRET: process.env.JWT_SECRET,
@@ -34,4 +44,6 @@ export const config = {
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET, 
     NODE_ENV: process.env.NODE_ENV || 'development',
     IMAGEKIT_PRIVATE_KEY: process.env.IMAGEKIT_PRIVATE_KEY,
+    RAZORPAY_KEY_ID: process.env.RAZORPAY_KEY_ID,
+    RAZORPAY_KEY_SECRET: process.env.RAZORPAY_KEY_SECRET,   
 }
