@@ -17,7 +17,7 @@ const OrderRegistry = () => {
                     setOrders(data.orders)
                 }
             } catch (error) {
-                console.error("Failed to fetch registry:", error)
+                console.error("Failed to fetch orders:", error)
             } finally {
                 setLoading(false)
             }
@@ -50,10 +50,10 @@ const OrderRegistry = () => {
                         transition={{ duration: 1 }}
                     >
                         <p className="text-[9px] font-black uppercase tracking-[0.8em] text-amber-500/50 mb-4">
-                            Personal Collection
+                            Your Purchases
                         </p>
                         <h1 className="text-5xl md:text-7xl font-extralight tracking-[-0.05em] leading-none mb-2">
-                            The <span className="italic font-serif text-amber-400">Registry</span>
+                            Order <span className="italic font-serif text-amber-400">History</span>
                         </h1>
                     </motion.div>
 
@@ -64,13 +64,13 @@ const OrderRegistry = () => {
                         className="flex flex-wrap gap-12 md:pb-2"
                     >
                         <div className="flex flex-col gap-2">
-                            <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20">Acquisitions</p>
+                            <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20">Total Orders</p>
                             <p className="text-3xl md:text-4xl font-extralight tracking-tighter tabular-nums">
                                 {orders.length}
                             </p>
                         </div>
                         <div className="flex flex-col gap-2">
-                            <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20">Investment Value</p>
+                            <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20">Total Spent</p>
                             <div className="flex items-baseline gap-2">
                                 <span className="text-[10px] font-bold text-amber-500 tracking-widest uppercase">INR</span>
                                 <p className="text-3xl md:text-4xl font-extralight tracking-tighter tabular-nums">
@@ -90,7 +90,7 @@ const OrderRegistry = () => {
                                 className="absolute inset-0 bg-amber-400"
                             />
                         </div>
-                        <p className="text-[9px] font-black uppercase tracking-[0.5em] text-white/20">Accessing Archives</p>
+                        <p className="text-[9px] font-black uppercase tracking-[0.5em] text-white/20">Loading Orders</p>
                     </div>
                 ) : orders.length === 0 ? (
                     <motion.div 
@@ -98,9 +98,9 @@ const OrderRegistry = () => {
                         animate={{ opacity: 1 }}
                         className="text-center py-40 group"
                     >
-                        <h2 className="text-2xl font-light text-white/40 mb-8 tracking-tight italic">Your vault is currently empty.</h2>
+                        <h2 className="text-2xl font-light text-white/40 mb-8 tracking-tight italic">No orders found in your history.</h2>
                         <Link to="/" className="inline-flex items-center gap-4 text-amber-400 text-[10px] font-black uppercase tracking-[0.5em] group-hover:gap-8 transition-all duration-700">
-                            Begin Selection <span className="text-xl">→</span>
+                            Start Shopping <span className="text-xl">→</span>
                         </Link>
                     </motion.div>
                 ) : (
@@ -126,10 +126,10 @@ const OrderRegistry = () => {
                                     <div className="mt-auto pt-12">
                                         <div className="flex items-center gap-3 mb-4">
                                             <div className="w-2 h-2 rounded-full bg-emerald-500/40 shadow-[0_0_10px_rgba(16,185,129,0.3)]" />
-                                            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-emerald-400/60">Verified</span>
+                                            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-emerald-400/60">Success</span>
                                         </div>
                                         <p className="text-[10px] font-mono text-white/20 tracking-widest break-all hover:text-white/40 transition-colors cursor-help">
-                                            REF: {order.razorpay.orderId}
+                                            ID: {order.razorpay.orderId}
                                         </p>
                                     </div>
                                 </div>
@@ -153,15 +153,15 @@ const OrderRegistry = () => {
                                                         />
                                                     </div>
                                                     <div className="flex-1 text-center md:text-left">
-                                                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-amber-400/60 mb-3 italic">Acquisition {idx + 1}</p>
+                                                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-amber-400/60 mb-3 italic">Item {idx + 1}</p>
                                                         <h4 className="text-2xl md:text-3xl font-light text-white tracking-tighter leading-tight mb-6 group-hover:text-amber-400 transition-colors">{item.title}</h4>
                                                         <div className="flex flex-wrap justify-center md:justify-start gap-8 items-center">
                                                             <div className="flex flex-col">
                                                                 <span className="text-[9px] font-black uppercase tracking-widest text-white/20 mb-1">Quantity</span>
-                                                                <span className="text-lg font-light">{item.quantity} units</span>
+                                                                <span className="text-lg font-light">{item.quantity}</span>
                                                             </div>
                                                             <div className="flex flex-col">
-                                                                <span className="text-[9px] font-black uppercase tracking-widest text-white/20 mb-1">Unit Price</span>
+                                                                <span className="text-[9px] font-black uppercase tracking-widest text-white/20 mb-1">Price</span>
                                                                 <span className="text-lg font-light">{item.price.currency} {item.price.amount.toLocaleString()}</span>
                                                             </div>
                                                         </div>
@@ -174,7 +174,7 @@ const OrderRegistry = () => {
                                     {/* Simplified Order Footer */}
                                     <div className="flex items-center justify-between border-t border-white/5 pt-8">
                                         <div>
-                                            <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20 mb-2">Acquisition Total</p>
+                                            <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20 mb-2">Order Total</p>
                                             <p className="text-3xl font-light text-amber-400 tracking-tighter">
                                                 {order.price.currency} {order.price.amount.toLocaleString()}
                                             </p>

@@ -4,11 +4,14 @@ const CartNotification = ({ closeToast, toastProps }) => {
     const { title, image, quantity, navigate } = toastProps.data
 
     return (
-        <div className="relative p-5 w-full">
-            {/* Topmost Right Close Button */}
+        <div className="relative p-8 w-full min-w-[380px] overflow-hidden group">
+            {/* Atmospheric Background Glow */}
+            <div className="absolute -right-20 -top-20 w-40 h-40 blur-[80px] opacity-30 rounded-full bg-amber-500 transition-all duration-700" />
+
+            {/* Close Button */}
             <button 
                 onClick={closeToast}
-                className="absolute top-1 right-2 p-1.5 text-white/30 hover:text-white transition-colors duration-300 z-50 group"
+                className="absolute top-6 right-6 p-1 text-white/20 hover:text-white transition-all duration-300 z-50 hover:rotate-90"
                 aria-label="Close notification"
             >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -16,26 +19,19 @@ const CartNotification = ({ closeToast, toastProps }) => {
                 </svg>
             </button>
 
-            <div className="flex items-center gap-5">
-                {/* Image Frame */}
-                <div className="relative h-20 w-20 shrink-0 rounded-2xl bg-neutral-900 border border-white/10 overflow-hidden shadow-inner flex items-center justify-center">
-                    <img src={image} alt={title} className="h-full w-full object-contain p-2 scale-110" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-40" />
+            <div className="flex items-center gap-8 relative z-10">
+                {/* Product Frame - Spotlight Effect */}
+                <div className="relative h-24 w-24 shrink-0 rounded-[1.5rem] bg-black/60 border border-white/10 flex items-center justify-center overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
+                    <div className="absolute inset-0 bg-gradient-to-tr from-amber-500/10 via-transparent to-white/5 opacity-40" />
+                    <img src={image} alt={title} className="h-full w-full object-contain p-3 transition-transform duration-700 group-hover:scale-110 drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)]" />
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 flex flex-col justify-between py-0.5 min-h-[80px]">
-                    <div>
-                        <div className="flex items-center gap-2 mb-1">
-                            <div className="w-1 h-1 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
-                            <p className="text-[8px] font-black text-emerald-500/80 uppercase tracking-[0.4em]">
-                                Added to Bag
-                            </p>
-                        </div>
-                        <h4 className="text-xs font-bold text-white uppercase tracking-tight line-clamp-1 mb-0.5">{title}</h4>
-                        <p className="text-[9px] text-amber-400 font-black uppercase tracking-[0.2em] opacity-90">
-                            {quantity} {quantity > 1 ? "Pieces" : "Piece"}
-                        </p>
+                <div className="flex-1">
+                    <div className="mb-4">
+                        <p className="text-[10px] font-black uppercase tracking-[0.5em] text-amber-400 mb-2">Acquisition Added</p>
+                        <p className="text-lg font-light text-white tracking-tight leading-tight line-clamp-1 italic">{title}</p>
+                        <p className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mt-1">Quantity: {quantity}</p>
                     </div>
 
                     <button 
@@ -43,9 +39,9 @@ const CartNotification = ({ closeToast, toastProps }) => {
                             navigate("/cart")
                             closeToast()
                         }}
-                        className="w-full mt-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-[8px] font-black uppercase tracking-[0.3em] text-white hover:bg-white/10 hover:border-white/20 transition-all duration-300 active:scale-[0.98]"
+                        className="flex h-10 px-6 items-center justify-center rounded-full bg-white text-black text-[10px] font-black uppercase tracking-[0.2em] hover:bg-amber-400 transition-all duration-500 shadow-[0_10px_20px_rgba(0,0,0,0.3)]"
                     >
-                        View Bag
+                        Review Bag
                     </button>
                 </div>
             </div>

@@ -14,6 +14,7 @@ import SellerProductDetails from "../features/products/pages/SellerProductDetail
 import Cart from "../features/cart/pages/Cart"
 import OrderSuccess from "../features/cart/pages/OrderSuccess"
 import OrderRegistry from "../features/cart/pages/OrderRegistry"
+import Favorites from "../features/products/pages/Favorites"
 import AppLayout from "./AppLayout"
 
 export const routes = createBrowserRouter([
@@ -100,6 +101,14 @@ export const routes = createBrowserRouter([
         element: (
           <Protected>
             <OrderRegistry />
+          </Protected>
+        ),
+      },
+      {
+        path: "/account/favorites",
+        element: (
+          <Protected>
+            <Favorites />
           </Protected>
         ),
       },

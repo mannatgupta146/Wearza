@@ -293,12 +293,33 @@ export const verifyOrderController = async (req, res) => {
 
         await payment.save()
 
-        // Dispatch Confirmation Email (Background)
+        // 1. Decrease Stock for each item
+        try {
+            await Promise.all(payment.orderItems.map(item => 
+                productModel.updateOne(
+                    { _id: item.productId, "variants._id": item.variantId },
+                    { $inc: { "variants.$.stock": -item.quantity } }
+                )
+            ));
+        } catch (stockError) {
+            console.error("Inventory Sync Failure:", stockError.message);
+        }
+
+        // 2. Clear User's Cart
+        try {
+            await cartModel.findOneAndUpdate(
+                { user: userId },
+                { $set: { items: [] } }
+            );
+        } catch (cartError) {
+            console.error("Cart Clearance Failure:", cartError.message);
+        }
+
+        // 3. Dispatch Confirmation Email (Background)
         try {
             await sendOrderConfirmationEmail(payment, req.user.email);
         } catch (emailError) {
             console.error("Delayed Dispatch Failure:", emailError.message);
-            // We don't block the response even if email fails
         }
 
         return res.status(200).json({ 

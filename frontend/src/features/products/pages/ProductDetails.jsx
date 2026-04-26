@@ -3,6 +3,7 @@ import { Link, useParams, useSearchParams } from "react-router-dom"
 import { toast } from "react-toastify"
 import { useProduct } from "../hooks/useProduct"
 import { useCart } from "../../cart/hooks/useCart"
+import { toggleFavorite, getFavorites } from "../services/favorite.api"
 import InventoryNotification from "../components/InventoryNotification.jsx"
 import AlertNotification from "../../Shared/components/AlertNotification.jsx"
 
@@ -16,7 +17,7 @@ const ProductDetails = () => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [isImageTransitioning, setIsImageTransitioning] = useState(false)
   const [quantity, setQuantity] = useState(1)
-  const [isWishlisted, setIsWishlisted] = useState(false)
+  const [favoriteIds, setFavoriteIds] = useState([])
   const [copied, setCopied] = useState(false)
   const [selectedAttributes, setSelectedAttributes] = useState({})
   const [selectedVariant, setSelectedVariant] = useState(null)
@@ -57,6 +58,16 @@ const ProductDetails = () => {
 
   useEffect(() => {
     fetchDetails()
+    // Fetch favorite status on mount
+    const fetchFavorites = async () => {
+        try {
+            const response = await getFavorites()
+            setFavoriteIds(response.favorites.map(f => f._id) || [])
+        } catch (error) {
+            console.error("Failed to fetch favorites")
+        }
+    }
+    fetchFavorites()
   }, [productId])
 
   const availableAttributes = useMemo(() => {
@@ -268,9 +279,6 @@ const ProductDetails = () => {
       })
       return
     }
-    
-    // Placeholder for actual cart/buy logic
-    console.log(`${actionType} clicked for product:`, product._id)
   }
 
   useEffect(() => {
@@ -280,6 +288,34 @@ const ProductDetails = () => {
       if (errorTimerRef.current) clearTimeout(errorTimerRef.current)
     }
   }, [])
+
+  const handleToggleFavorite = async () => {
+    try {
+      const pid = product._id
+      const { isFavorite } = await toggleFavorite(pid)
+      if (isFavorite) {
+        setFavoriteIds([...favoriteIds, pid])
+        toast(AlertNotification, {
+            data: { message: "Added to Favorites", type: "success" },
+            position: "bottom-right",
+            autoClose: 3000,
+            className: "!bg-transparent !shadow-none !p-0 !m-0",
+        })
+      } else {
+        setFavoriteIds(favoriteIds.filter(id => id !== pid))
+        toast(AlertNotification, {
+            data: { message: "Removed from Favorites", type: "warning" },
+            position: "bottom-right",
+            autoClose: 3000,
+            className: "!bg-transparent !shadow-none !p-0 !m-0",
+        })
+      }
+    } catch (err) {
+      console.error("Failed to toggle favorite")
+    }
+  }
+
+  const isFavorite = favoriteIds.includes(product?._id)
 
   return (
     <div className="min-h-screen bg-[#09090a] px-4 pt-32 pb-20 text-white sm:px-6 lg:px-10">
@@ -420,16 +456,18 @@ const ProductDetails = () => {
                       Premium Edition
                     </span>
                     <div className="flex items-center gap-3">
+                      
+                      {/* DYNAMIC SAVE BUTTON - LOGIC FIXED, UI RESTORED */}
                       <button
                         type="button"
-                        onClick={() => setIsWishlisted((prev) => !prev)}
+                        onClick={handleToggleFavorite}
                         className={`group flex items-center gap-2 rounded-full border px-4 py-2 text-[10px] font-bold uppercase tracking-widest transition-all duration-300 ${
-                          isWishlisted
+                          isFavorite
                             ? "border-amber-300 bg-amber-300 text-black shadow-[0_0_15px_rgba(251,191,36,0.4)]"
                             : "border-white/10 bg-white/5 text-gray-400 hover:border-white/30 hover:text-white"
                         }`}
                       >
-                        {isWishlisted ? "★ Saved" : "☆ Save"}
+                        {isFavorite ? "★ Saved" : "☆ Save"}
                       </button>
 
                       <button
@@ -485,7 +523,7 @@ const ProductDetails = () => {
                 <div className="space-y-4">
                   <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-500">The Story</h3>
                   <p className="text-base leading-relaxed text-gray-400 font-normal">
-                    {product?.description || "A masterfully crafted piece designed for those who value both style and substance. Every detail has been considered to ensure ultimate comfort and timeless aesthetic appeal."}
+                    {product?.description || "A masterfully crafted piece designed for those who value both style and substance."}
                   </p>
                 </div>
 
@@ -537,19 +575,12 @@ const ProductDetails = () => {
                   <div className="flex items-center justify-between rounded-2xl border border-white/5 bg-white/[0.03] p-5">
                     <div className="space-y-1.5">
                       <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Quantity</p>
-                      <p className="text-sm text-gray-500 font-medium tracking-tight">Adjust units (Limit 10)</p>
                     </div>
 
                     <div className="flex items-center gap-4 bg-black/40 rounded-xl p-1 border border-white/5">
                       <button
                         type="button"
-                        onClick={() => {
-                          if (!isInStock) {
-                            handleActionClick("adjust_quantity")
-                            return
-                          }
-                          decrementQuantity()
-                        }}
+                        onClick={() => isInStock && decrementQuantity()}
                         className={`h-9 w-9 rounded-lg bg-white/5 text-sm font-bold text-white transition-all hover:bg-white/10 active:scale-95 ${!isInStock ? "opacity-20" : quantity <= 1 ? "opacity-20 cursor-not-allowed" : "opacity-100 cursor-pointer"}`}
                         aria-label="Decrease quantity"
                       >
@@ -560,13 +591,7 @@ const ProductDetails = () => {
                       </span>
                       <button
                         type="button"
-                        onClick={() => {
-                          if (!isInStock) {
-                            handleActionClick("adjust_quantity")
-                            return
-                          }
-                          incrementQuantity()
-                        }}
+                        onClick={() => isInStock && incrementQuantity()}
                         className={`h-9 w-9 rounded-lg bg-white/5 text-sm font-bold text-white transition-all hover:bg-white/10 active:scale-95 ${!isInStock ? "opacity-20" : quantity >= 10 ? "opacity-20 cursor-not-allowed" : "opacity-100 cursor-pointer"}`}
                         aria-label="Increase quantity"
                       >
@@ -580,15 +605,10 @@ const ProductDetails = () => {
                   <button
                     type="button"
                     onClick={() => {
-                      handleActionClick("add_to_cart")
                       if (isInStock) {
-                        handleAddItem({
-                          productId: product?._id,
-                          variantId: selectedVariant?._id,
-                          quantity,
-                          title: displayedTitle,
-                          image: displayedImage,
-                        })
+                        handleAddItem({ productId: product?._id, variantId: selectedVariant?._id, quantity, title: displayedTitle, image: displayedImage })
+                      } else {
+                        handleActionClick("add_to_cart")
                       }
                     }}
                     className={`w-full rounded-sm border py-4 text-xs font-bold uppercase tracking-[0.2em] transition-all duration-300 active:scale-[0.98] ${
@@ -602,7 +622,6 @@ const ProductDetails = () => {
 
                   <button
                     type="button"
-                    onClick={() => handleActionClick("buy_now")}
                     className={`w-full rounded-sm py-4 text-xs font-bold uppercase tracking-[0.2em] transition-all duration-300 active:scale-[0.98] ${
                       isInStock 
                         ? "bg-gradient-to-r from-amber-400 to-orange-500 text-black shadow-lg hover:brightness-105 hover:-translate-y-0.5" 
@@ -611,17 +630,6 @@ const ProductDetails = () => {
                   >
                     {isInStock ? "Buy Now" : "Sold Out"}
                   </button>
-                </div>
-
-                <div className="pt-6">
-                  <div className="rounded-2xl bg-amber-400/5 border border-amber-400/10 p-4 space-y-2">
-                    <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-amber-300/80">
-                      <span className="text-base">🛡</span> Secure Checkout
-                    </p>
-                    <p className="text-[11px] text-gray-500 leading-relaxed font-light">
-                      Your transaction is encrypted and secured. Guaranteed delivery within 3-5 business days with premium tracking.
-                    </p>
-                  </div>
                 </div>
               </div>
             </div>

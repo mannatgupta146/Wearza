@@ -59,12 +59,28 @@ const Nav = () => {
                     `}>
                         Home
                     </NavLink>
+                    {user && (
+                        <>
+                            <NavLink to="/account/favorites" className={({ isActive }) => `
+                                text-[10px] font-bold uppercase tracking-[0.25em] transition-all
+                                ${isActive ? "text-amber-400" : "text-white/40 hover:text-white"}
+                            `}>
+                                Favorites
+                            </NavLink>
+                            <NavLink to="/account/orders" className={({ isActive }) => `
+                                text-[10px] font-bold uppercase tracking-[0.25em] transition-all
+                                ${isActive ? "text-amber-400" : "text-white/40 hover:text-white"}
+                            `}>
+                                Orders
+                            </NavLink>
+                        </>
+                    )}
                     {user?.role === "seller" && (
                         <NavLink to="/seller/dashboard" className={({ isActive }) => `
                             text-[10px] font-bold uppercase tracking-[0.25em] transition-all
                             ${isActive ? "text-amber-400" : "text-white/40 hover:text-white"}
                         `}>
-                            Seller Dashboard
+                            Dashboard
                         </NavLink>
                     )}
                 </nav>
