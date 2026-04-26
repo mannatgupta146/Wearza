@@ -1,7 +1,7 @@
 import { Router } from "express"
 import { authenticateUser } from "../middleware/auth.middleware.js"
 import { validateAddToCart, validateUpdateCart } from "../validators/cart.validator.js"
-import { addToCartController, createOrderController, getCartController, removeFromCartController, updateCartController, verifyOrderController } from "../controllers/cart.controller.js"
+import { addToCartController, createOrderController, getCartController, getOrderHistoryController, removeFromCartController, updateCartController, verifyOrderController } from "../controllers/cart.controller.js"
 
 const cartRouter = Router()
 
@@ -12,6 +12,13 @@ const cartRouter = Router()
  */
 
 cartRouter.get('/', authenticateUser, getCartController)
+
+/**
+ * @route GET /cart/orders
+ * @desc Get user's order history
+ * @access Private
+ */
+cartRouter.get('/orders', authenticateUser, getOrderHistoryController)
 
 /**
  * @route POST /cart/add/:productId/:variantId

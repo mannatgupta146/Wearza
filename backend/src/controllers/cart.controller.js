@@ -4,6 +4,7 @@ import { stockOfVariant } from "../dao/product.dao.js"
 import { createOrder } from "../services/payment.service.js"
 import { getCartDetails } from "../dao/cart.dao.js"
 import paymentModel from "../models/payment.model.js"
+import { sendOrderConfirmationEmail } from "../services/email.service.js"
 import { validatePaymentVerification } from "razorpay/dist/utils/razorpay-utils.js"
 import { config } from "../config/config.js"
 
@@ -292,6 +293,14 @@ export const verifyOrderController = async (req, res) => {
 
         await payment.save()
 
+        // Dispatch Confirmation Email (Background)
+        try {
+            await sendOrderConfirmationEmail(payment, req.user.email);
+        } catch (emailError) {
+            console.error("Delayed Dispatch Failure:", emailError.message);
+            // We don't block the response even if email fails
+        }
+
         return res.status(200).json({ 
             success: true, 
             message: "Payment verified successfully" 
@@ -301,6 +310,26 @@ export const verifyOrderController = async (req, res) => {
         return res.status(500).json({ 
             success: false, 
             message: "Internal server error" 
+        })
+    }
+}
+
+export const getOrderHistoryController = async (req, res) => {
+    try {
+        const orders = await paymentModel.find({ 
+            user: req.user._id,
+            status: "SUCCESS"
+        }).sort({ paymentDate: -1 })
+
+        return res.status(200).json({
+            success: true,
+            message: "Orders retrieved successfully",
+            orders
+        })
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message || "Failed to fetch orders"
         })
     }
 }
