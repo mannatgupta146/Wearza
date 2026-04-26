@@ -49,10 +49,10 @@ const Favorites = () => {
                         transition={{ duration: 1 }}
                     >
                         <p className="text-[9px] font-black uppercase tracking-[0.8em] text-amber-500/50 mb-4">
-                            Curated Selection
+                            Saved Items
                         </p>
                         <h1 className="text-6xl md:text-8xl font-extralight tracking-[-0.05em] leading-none mb-2">
-                            The <span className="italic font-serif text-amber-400">Gallery</span>
+                            Your <span className="italic font-serif text-amber-400">Favorites</span>
                         </h1>
                     </motion.div>
 
@@ -62,7 +62,7 @@ const Favorites = () => {
                         transition={{ delay: 0.3, duration: 0.8 }}
                         className="flex flex-col gap-2"
                     >
-                        <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20">Saved Pieces</p>
+                        <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20">Saved Items</p>
                         <p className="text-4xl font-extralight tracking-tighter tabular-nums">
                             {favorites.length}
                         </p>
@@ -78,7 +78,7 @@ const Favorites = () => {
                                 className="absolute inset-0 bg-amber-400"
                             />
                         </div>
-                        <p className="text-[9px] font-black uppercase tracking-[0.5em] text-white/20">Loading Archives</p>
+                        <p className="text-[9px] font-black uppercase tracking-[0.5em] text-white/20">Loading Favorites</p>
                     </div>
                 ) : favorites.length === 0 ? (
                     <motion.div 
@@ -86,9 +86,9 @@ const Favorites = () => {
                         animate={{ opacity: 1 }}
                         className="text-center py-40 bg-white/[0.02] border border-white/[0.05] rounded-[3rem] backdrop-blur-3xl"
                     >
-                        <h2 className="text-2xl font-light text-white/40 mb-8 tracking-tight italic">Your gallery is currently empty.</h2>
+                        <h2 className="text-2xl font-light text-white/40 mb-8 tracking-tight italic">Your favorites list is currently empty.</h2>
                         <Link to="/" className="inline-flex items-center gap-4 text-amber-400 text-[10px] font-black uppercase tracking-[0.5em] hover:gap-8 transition-all duration-700">
-                            Explore Collections <span className="text-xl">→</span>
+                            Explore Collection <span className="text-xl">→</span>
                         </Link>
                     </motion.div>
                 ) : (

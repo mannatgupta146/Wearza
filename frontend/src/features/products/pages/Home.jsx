@@ -230,7 +230,7 @@ const Home = () => {
         )}
       </AnimatePresence>
 
-      <main className="relative overflow-hidden px-8 pt-40 pb-40 lg:px-20">
+      <main className="relative overflow-hidden px-8 pt-32 pb-32 lg:px-20">
         {/* Background Depth */}
         <div className="pointer-events-none fixed left-[-10%] top-[-10%] h-[60%] w-[60%] rounded-full bg-amber-500/5 blur-[160px]" />
         <div className="pointer-events-none fixed right-[-10%] bottom-[-10%] h-[60%] w-[60%] rounded-full bg-orange-600/5 blur-[160px]" />
@@ -242,9 +242,9 @@ const Home = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1 }}
             >
-              <p className="mb-4 text-[10px] font-black uppercase tracking-[0.6em] text-amber-500/50">Curated Marketplace</p>
+              <p className="mb-4 text-[10px] font-black uppercase tracking-[0.6em] text-amber-500/50">Marketplace</p>
               <h2 className="text-6xl font-extralight tracking-[-0.04em] leading-[0.95] sm:text-8xl">
-                The <span className="italic font-serif text-amber-400">Registry</span> Archive.
+                The <span className="italic font-serif text-amber-400">Collection</span> Archive.
               </h2>
             </motion.div>
           </header>
