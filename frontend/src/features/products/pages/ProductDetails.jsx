@@ -119,11 +119,16 @@ const ProductDetails = () => {
     : productImages[selectedImageIndex] || null
 
   const displayedTitle = selectedVariant?.title || product?.title
-  const displayedPrice =
-    selectedVariant?.price?.amount || product?.price?.amount
-  const displayedMrp =
-    selectedVariant?.price?.mrp || product?.price?.mrp
-  const displayedStock = selectedVariant?.stock || product?.stock || 0
+  const displayedPrice = selectedVariant?.price?.amount || product?.price?.amount
+  const displayedMrp = selectedVariant?.price?.mrp || product?.price?.mrp
+  
+  // Selection-Dependent Stock Logic
+  // 1. If variant selected, use that specific variant's stock
+  // 2. If no variant selected, use the base product's stock ONLY
+  const displayedStock = selectedVariant 
+    ? selectedVariant.stock 
+    : (product?.stock || 0)
+        
   const isInStock = displayedStock > 0
 
   const setImageWithTransition = (nextIndex) => {
@@ -492,7 +497,7 @@ const ProductDetails = () => {
                     </div>
                   </div>
 
-                  <h1 className="bg-gradient-to-br from-white via-white to-gray-500 bg-clip-text text-3xl font-bold tracking-tight text-transparent sm:text-4xl lg:text-5xl">
+                  <h1 className="bg-gradient-to-br from-white via-white to-gray-500 bg-clip-text text-2xl font-bold tracking-tight text-transparent sm:text-3xl">
                     {displayedTitle}
                   </h1>
 
@@ -525,6 +530,11 @@ const ProductDetails = () => {
                   <p className="text-base leading-relaxed text-gray-400 font-normal">
                     {product?.description || "A masterfully crafted piece designed for those who value both style and substance."}
                   </p>
+                  {(product?.stock || 0) <= 0 && !selectedVariant && (product?.variants?.reduce((sum, v) => sum + (v.stock || 0), 0) || 0) > 0 && (
+                    <p className="text-xs italic text-amber-400/80 mt-2 border-l border-amber-400/20 pl-3">
+                      The base edition is currently unavailable. Please explore other variants below.
+                    </p>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -574,7 +584,7 @@ const ProductDetails = () => {
 
                   <div className="flex items-center justify-between rounded-2xl border border-white/5 bg-white/[0.03] p-5">
                     <div className="space-y-1.5">
-                      <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Quantity</p>
+                      <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Quantity (Max 10)</p>
                     </div>
 
                     <div className="flex items-center gap-4 bg-black/40 rounded-xl p-1 border border-white/5">
@@ -608,7 +618,7 @@ const ProductDetails = () => {
                       if (isInStock) {
                         handleAddItem({ productId: product?._id, variantId: selectedVariant?._id, quantity, title: displayedTitle, image: displayedImage })
                       } else {
-                        handleActionClick("add_to_cart")
+                        toast.warning("Out of Stock")
                       }
                     }}
                     className={`w-full rounded-sm border py-4 text-xs font-bold uppercase tracking-[0.2em] transition-all duration-300 active:scale-[0.98] ${

@@ -13,8 +13,10 @@ const ProductCard = ({ product, navigate, formatCurrency, isFavorite, onToggleFa
   const images = product?.images?.map(img => img.url).filter(Boolean) || []
   const image = images[currentImageIndex] || "/placeholder.png"
   
-  // Calculate actual stock from variants
-  const totalStock = product?.variants?.reduce((sum, v) => sum + (v.stock || 0), 0) || 0
+  // Calculate actual stock from both base product and its variants
+  const baseStock = product?.stock || 0
+  const variantStockSum = product?.variants?.reduce((sum, v) => sum + (v.stock || 0), 0) || 0
+  const totalStock = baseStock + variantStockSum
   const inStock = totalStock > 0
 
   React.useEffect(() => {
