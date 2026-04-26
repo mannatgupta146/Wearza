@@ -1,14 +1,15 @@
 import React, { useMemo, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useCart } from '../hooks/useCart'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { useRazorpay } from "react-razorpay";
 
 const Cart = () => {
     const { items: cart, totalPrice, currency } = useSelector(state => state.cart)
-    const { handleGetCart, handleRemoveItem, handleUpdateItem, handleCreateCartOrder } = useCart()
+    const { handleGetCart, handleRemoveItem, handleUpdateItem, handleCreateCartOrder, handleVerifyCartOrder } = useCart()
     const [loading, setLoading] = useState(true)
+    const navigate = useNavigate()
     const user = useSelector(state => state.user)
     const { error, isLoading, Razorpay} = useRazorpay();
 
@@ -32,9 +33,18 @@ const Cart = () => {
             name: "Wearza",
             description: "Payment for your order",
             order_id: order.id, 
-            handler: (response) => {
-                console.log(response);
-                navigate("/")
+            handler: async (response) => {
+                const isValid = await handleVerifyCartOrder(response)
+
+                if (isValid) {
+                    navigate(`/order-success?order_id=${response.razorpay_order_id}`)
+                    toast.success(isValid.message, {
+                        position: "bottom-right",
+                        autoClose: 2000,
+                        hideProgressBar: true,
+                        theme: "dark",
+                    })
+                }
             },
             prefill: {
                 name: user?.fullname,

@@ -4,6 +4,8 @@ import { stockOfVariant } from "../dao/product.dao.js"
 import { createOrder } from "../services/payment.service.js"
 import { getCartDetails } from "../dao/cart.dao.js"
 import paymentModel from "../models/payment.model.js"
+import { validatePaymentVerification } from "razorpay/dist/utils/razorpay-utils.js"
+import { config } from "../config/config.js"
 
 export const addToCartController = async (req, res) => {
     try {
@@ -249,6 +251,56 @@ export const createOrderController = async (req, res) => {
         return res.status(500).json({
             success: false,
             message: error.message || "Failed to create order"
+        })
+    }
+}
+
+export const verifyOrderController = async (req, res) => {
+    try {
+        const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body
+        const userId = req.user._id
+
+        const payment = await paymentModel.findOne({ 
+            "razorpay.orderId": razorpay_order_id,
+            status: "PENDING",
+            user: userId 
+        })
+
+        if (!payment) return res.status(404).json({ 
+            success: false, 
+            message: "Payment not found" 
+        })
+
+        const isPaymentValid = validatePaymentVerification({
+            order_id: razorpay_order_id,
+            payment_id: razorpay_payment_id,
+        }, razorpay_signature, config.RAZORPAY_KEY_SECRET)
+
+        if(!isPaymentValid) {
+            payment.status = "FAILED"
+            await payment.save()
+            
+            return res.status(400).json({ 
+                success: false, 
+                message: "Invalid payment" 
+            })
+        }
+
+        payment.razorpay.paymentId = razorpay_payment_id
+        payment.razorpay.signature = razorpay_signature
+        payment.status = "SUCCESS"
+
+        await payment.save()
+
+        return res.status(200).json({ 
+            success: true, 
+            message: "Payment verified successfully" 
+        })
+
+    } catch (error) {
+        return res.status(500).json({ 
+            success: false, 
+            message: "Internal server error" 
         })
     }
 }

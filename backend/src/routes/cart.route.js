@@ -1,7 +1,7 @@
 import { Router } from "express"
 import { authenticateUser } from "../middleware/auth.middleware.js"
 import { validateAddToCart, validateUpdateCart } from "../validators/cart.validator.js"
-import { addToCartController, createOrderController, getCartController, removeFromCartController, updateCartController } from "../controllers/cart.controller.js"
+import { addToCartController, createOrderController, getCartController, removeFromCartController, updateCartController, verifyOrderController } from "../controllers/cart.controller.js"
 
 const cartRouter = Router()
 
@@ -43,5 +43,13 @@ cartRouter.put('/update/:productId/:variantId', authenticateUser, validateUpdate
  */
 
 cartRouter.post('/payment/create/order', authenticateUser, createOrderController)
+
+/**
+ * @route POST /cart/payment/verify/order
+ * @desc Verify order for payment
+ * @access Private
+ */
+
+cartRouter.post('/payment/verify/order', authenticateUser, verifyOrderController)
 
 export default cartRouter
